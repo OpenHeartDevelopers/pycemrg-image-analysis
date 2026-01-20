@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pycemrg-image-analysis"
+version = "0.1.0"
+authors = [
+  { name="Jose Alonso Solis-Lemus", email="j.solis-lemus@imperial.ac.uk" },
+]
+description = "A high-level framework for cardiac model creation and simulation setup."
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+dependencies = [
+    "pycemrg>=0.1.0",
+    "numpy >=2.2.0",
+    "pyyaml>=6.0", # <-- Keep this declaration
+    "scipy >=1.14.1",
+    "simpleitk >=2.4.0",
+    "h5py >=3.12.1",
+    "img >=2.5",
+    "joblib >=1.4.2",
+    "matplotlib >=3.9.3",
+    "meshio >=5.3.5",
+    "pynrrd >=1.1.1",
+    "pydicom >=3.0.1",
+    "pygeodesic >=0.1.11",
+    "pylab-sdk >=1.7.2",
+    "sets >=0.3.2",
+    "tqdm >=4.67.1",
+    "trimesh >=4.5.3",
+    "nibabel >=5.3.2",
+    "scikit-image >=0.24.0",
+    "pytest"
+]
+
+[project.urls]
+Homepage = "https://github.com/OpenHeartDevelopers/pycemrg-image-analysis" # not set up yet
+"Bug Tracker" = "https://github.com/OpenHeartDevelopers/pycemrg-image-analysis/issues" # not set up yet
+
+[tool.setuptools.packages.find]
+where = ["src"]
