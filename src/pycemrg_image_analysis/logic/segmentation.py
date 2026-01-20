@@ -16,9 +16,7 @@ class SegmentationLogic:
     NumPy arrays). It has no knowledge of file paths or project structures.
     """
 
-    def create_cylinder(
-        self, contract: CylinderCreationContract
-    ) -> sitk.Image:
+    def create_cylinder(self, contract: CylinderCreationContract) -> sitk.Image:
         """
         Creates a cylinder mask based on the provided contract.
 
@@ -53,7 +51,9 @@ class SegmentationLogic:
         cylinder_image = sitk.GetImageFromArray(cylinder_mask_array_transposed)
 
         # 3. Set the physical space metadata on the new image
-        cylinder_image.SetOrigin(contract.origin)
-        cylinder_image.SetSpacing(contract.spacing)
+        # converting contract origin/spacing to lists, which SimpleITK expects
+        cylinder_image.SetOrigin(contract.origin.tolist())
+        cylinder_image.SetSpacing(contract.spacing.tolist())
 
         return cylinder_image
+

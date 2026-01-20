@@ -60,3 +60,4 @@ class SegmentationPathBuilder:
             slicer_height=slicer_height,
             output_path=output_path,
         )
+
