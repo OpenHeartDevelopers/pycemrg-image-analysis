@@ -28,9 +28,11 @@ def test_create_cylinders(test_data_root: Path, tmp_path: Path):
     # --- 1. Define Paths and Load All Input Data ---
     logging.info("Arrange: Loading all input data from disk.")
     
-    origin_spacing_path = test_data_root / "origin_spacing.json"
-    points_path = test_data_root / "points.json"
-    reference_seg_path = test_data_root / "seg_corrected.nrrd"
+    cylinder_test_dir = test_data_root / "create_cylinders_test"
+
+    origin_spacing_path = cylinder_test_dir / "origin_spacing.json"
+    points_path = cylinder_test_dir / "points.json"
+    reference_seg_path = cylinder_test_dir / "seg_corrected.nrrd"
     output_dir = tmp_path / "cylinder_outputs"
 
     # --- Pre-condition Checks ---
