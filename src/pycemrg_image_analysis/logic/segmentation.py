@@ -4,7 +4,7 @@ import SimpleITK as sitk
 import numpy as np
 
 from pycemrg_image_analysis.logic.contracts import CylinderCreationContract
-from pycemrg_image_analysis.utilities import image as image_utils
+from pycemrg_image_analysis.utilities.geometry import calculate_cylinder_mask
 
 
 class SegmentationLogic:
@@ -34,7 +34,7 @@ class SegmentationLogic:
             will have the correct origin and spacing set.
         """
         # 1. Call the pure utility function to do the heavy lifting
-        cylinder_mask_array = image_utils.calculate_cylinder_mask(
+        cylinder_mask_array = calculate_cylinder_mask(
             image_shape=contract.image_shape,
             origin=contract.origin,
             spacing=contract.spacing,
