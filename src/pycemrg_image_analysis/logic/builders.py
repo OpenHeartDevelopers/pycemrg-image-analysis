@@ -1,10 +1,13 @@
 # src/pycemrg_image_analysis/logic/builders.py
 
+import numpy as np
+import SimpleITK as sitk
 from pathlib import Path
 from typing import Tuple
-import numpy as np
 
+from pycemrg.data.labels import LabelManager
 from pycemrg_image_analysis.logic.contracts import CylinderCreationContract
+from .contracts import MyocardiumCreationContract
 
 
 class SegmentationPathBuilder:
@@ -61,3 +64,49 @@ class SegmentationPathBuilder:
             output_path=output_path,
         )
 
+class MyocardiumPathBuilder:
+    """
+    A convenience builder for myocardium creation workflows.
+
+    This builder is initialized with the common components needed for a series
+    of myocardium creation steps (label manager, parameters, etc.). It then
+    simplifies the creation of the specific contract for each step.
+    """
+
+    def __init__(
+        self,
+        output_dir: Path,
+        label_manager: LabelManager,
+        parameters: dict[str, float],
+        input_image: sitk.Image,
+    ):
+        self._output_dir = output_dir
+        self._label_manager = label_manager
+        self._parameters = parameters
+        self._input_image = input_image
+
+    def build_creation_contract(
+        self, output_name: str
+    ) -> MyocardiumCreationContract:
+        """
+        Builds the contract for a single myocardium creation task.
+
+        The `rule` attribute is intentionally left as None. It is the
+        responsibility of the specific MyocardiumLogic method being called
+        (e.g., `create_aortic_wall`) to define and insert the correct rule.
+
+        Args:
+            output_name: The base name for the output file (e.g., "seg_s3b_aortic_wall").
+
+        Returns:
+            A MyocardiumCreationContract ready to be passed to a logic method.
+        """
+        output_path = self._output_dir / f"{output_name}.nrrd"
+
+        return MyocardiumCreationContract(
+            input_image=self._input_image,
+            rule=None,  # This is a placeholder; the Logic method will fill it in.
+            label_manager=self._label_manager,
+            parameters=self._parameters,
+            output_path=output_path,
+        )
