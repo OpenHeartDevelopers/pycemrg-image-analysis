@@ -9,6 +9,7 @@ from typing import Union
 from pycemrg.files import ConfigScaffolder
 from pycemrg_image_analysis.logic.constants import MyocardiumSemanticRole
 
+# schematics
 _AORTIC_WALL_SCHEMATIC = {
     "labels": {
         "LV_BP_label": 1,
@@ -23,13 +24,45 @@ _AORTIC_WALL_SCHEMATIC = {
         MyocardiumSemanticRole.SOURCE_BLOOD_POOL_NAME: "Ao_BP_label",
         MyocardiumSemanticRole.TARGET_MYOCARDIUM_NAME: "Ao_wall_label",
         MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME: "Ao_WT",
-        MyocardiumSemanticRole.APPLICATION_MODE: "REPLACE_EXCEPT",
-        MyocardiumSemanticRole.APPLICATION_RULE_LABEL_NAMES: [
-            "LV_BP_label",
-            "LV_myo_label",
-            "Ao_BP_label", # The corrected rule from our last session
+        
+        # This key is now APPLICATION_STEPS and its value is a list of step objects
+        MyocardiumSemanticRole.APPLICATION_STEPS: [
+            {
+                "MODE": "REPLACE_EXCEPT",
+                "RULE_LABEL_NAMES": [
+                    "LV_BP_label",
+                    "LV_myo_label",
+                    "Ao_BP_label",
+                ],
+            }
         ],
     },
+}
+
+_RV_MYOCARDIUM_SCHEMATIC = {
+    "labels": {
+        "RV_BP_label": 3,
+        "RV_myo_label": 103,
+        "Ao_wall_label": 106,        
+    }, 
+    "parameters": {
+        "RV_WT": 3.5,
+    },
+    "semantic_map": {
+        MyocardiumSemanticRole.SOURCE_BLOOD_POOL_NAME: "RV_BP_label",
+        MyocardiumSemanticRole.TARGET_MYOCARDIUM_NAME: "RV_myo_label",
+        MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME: "RV_WT",
+
+        # This key is now APPLICATION_STEPS and its value is a list of step objects
+        MyocardiumSemanticRole.APPLICATION_STEPS: [
+            {
+                "MODE": "REPLACE_ONLY",
+                "RULE_LABEL_NAMES": [
+                    "Ao_wall_label",
+                ],
+            }
+        ],
+    }
 }
 
 # The class now inherits from the core scaffolder
@@ -41,7 +74,7 @@ class ImageAnalysisScaffolder(ConfigScaffolder):
     
     _COMPONENT_SCHEMATICS = {
         "aortic_wall": _AORTIC_WALL_SCHEMATIC,
-        # Future schematics will be added here.
+        "rv_myocardium": _RV_MYOCARDIUM_SCHEMATIC,
     }
 
     def scaffold_components(

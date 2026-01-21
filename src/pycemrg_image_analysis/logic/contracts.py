@@ -33,16 +33,19 @@ class CylinderCreationContract:
     output_path: Path
 
 @dataclass(frozen=True)
+class ApplicationStep:
+    """Defines a single mask application operation."""
+    mode: MaskOperationMode
+    rule_label_names: list[str] = field(default_factory=list)
+
+@dataclass(frozen=True)
 class MyocardiumRule:
-    """
-    A configuration object defining the scientific rules for building one
-    piece of myocardium. This object is the "recipe" for a single structure.
-    """
+    """Defines the full recipe for building one piece of myocardium."""
     source_bp_label_name: str
     target_myo_label_name: str
     wall_thickness_parameter_name: str
-    application_mode: MaskOperationMode
-    application_rule_label_names: list[str] = field(default_factory=list)
+    # This now becomes a list of steps, not a single mode.
+    application_steps: list[ApplicationStep]
 
 
 @dataclass(frozen=True)

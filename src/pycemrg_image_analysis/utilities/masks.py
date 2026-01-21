@@ -8,12 +8,51 @@ import SimpleITK as sitk
 from pathlib import Path
 from enum import Enum, auto
 
+ZERO_LABEL = 0
+
 # This enum is critical for our rule-based logic
 class MaskOperationMode(Enum):
     REPLACE = auto()
     REPLACE_EXCEPT = auto()
     REPLACE_ONLY = auto()
     ADD = auto()
+
+def add_masks_replace_only(
+    base_array: np.ndarray, 
+    mask_array: np.ndarray,
+    new_mask_value: int, 
+    only_override_these_values: list[int],
+) -> np.ndarray:
+    """
+        Apply a mask to an image array, replacing the pixels that belong to the mask with a new value.
+
+        Parameters:
+            imga_array (np.ndarray): The first input image array.
+            imgb_array (np.ndarray): The second input image array.
+            newmask: The value to assign to the pixels in imga_array that belong to the mask.
+            only_override_this: The value of pixels in imga_array that should be overridden with the newmask.
+
+        Returns:
+            np.ndarray: The resulting image array after applying the mask and replacing the pixels.
+        """
+    if base_array.shape != mask_array.shape:
+        # A common issue in legacy code, handle it explicitly.
+        raise ValueError("Input and mask arrays must have the same shape.")
+
+    output_array = np.copy(base_array)
+
+    values_to_override = set(only_override_these_values)
+    values_to_override.add(0)
+
+    mask_region = mask_array != ZERO_LABEL
+    only_region = np.isin(output_array, list(values_to_override))
+
+    update_region = mask_region & only_region
+
+    output_array[update_region] = new_mask_value
+
+    return output_array
+    
 
 def add_masks_replace_except(
     base_array: np.ndarray,
@@ -42,7 +81,7 @@ def add_masks_replace_except(
     output_array = np.copy(base_array)
     
     # Create a boolean array for the mask region and for the exceptions
-    mask_region = mask_array != 0
+    mask_region = mask_array != ZERO_LABEL
     exception_region = np.isin(output_array, except_these_values)
 
     # The region to update is where the mask is active AND it's not an exception
