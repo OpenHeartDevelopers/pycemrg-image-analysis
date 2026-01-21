@@ -1,6 +1,6 @@
 # src/pycemrg_image_analysis/logic/myocardium.py
 
-import logging 
+import logging
 import SimpleITK as sitk
 
 from pycemrg.data.labels import LabelManager
@@ -11,6 +11,7 @@ from pycemrg_image_analysis.utilities import (
     masks,
     MaskOperationMode,
 )
+
 
 class MyocardiumLogic:
     """
@@ -41,9 +42,13 @@ class MyocardiumLogic:
         logging.info("1. Use the map to get the user's custom names and rules")
         source_bp_name = semantic_map[MyocardiumSemanticRole.SOURCE_BLOOD_POOL_NAME]
         target_myo_name = semantic_map[MyocardiumSemanticRole.TARGET_MYOCARDIUM_NAME]
-        wt_param_name = semantic_map[MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME]
+        wt_param_name = semantic_map[
+            MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME
+        ]
         app_mode_str = semantic_map[MyocardiumSemanticRole.APPLICATION_MODE]
-        app_rule_names = semantic_map[MyocardiumSemanticRole.APPLICATION_RULE_LABEL_NAMES]
+        app_rule_names = semantic_map[
+            MyocardiumSemanticRole.APPLICATION_RULE_LABEL_NAMES
+        ]
 
         logging.info("2. Translate names and rules to concrete values")
         source_bp_value = label_manager.get_value(source_bp_name)
@@ -78,3 +83,4 @@ class MyocardiumLogic:
         output_image = sitk.GetImageFromArray(output_array)
         output_image.CopyInformation(input_image)
         return output_image
+
