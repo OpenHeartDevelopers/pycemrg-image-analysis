@@ -18,10 +18,7 @@ _LV_OUTFLOW_SCHEMATIC = {
         MyocardiumSemanticRole.TARGET_MYOCARDIUM_NAME: "LV_myo_label",
         MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME: "LV_neck_WT",
         MyocardiumSemanticRole.APPLICATION_STEPS: [
-            {
-                "MODE": "ADD", 
-                "RULE_LABEL_NAMES": []
-             }
+            {"MODE": "ADD", "RULE_LABEL_NAMES": []}
         ],
     },
 }
@@ -40,7 +37,6 @@ _AORTIC_WALL_SCHEMATIC = {
         MyocardiumSemanticRole.SOURCE_BLOOD_POOL_NAME: "Ao_BP_label",
         MyocardiumSemanticRole.TARGET_MYOCARDIUM_NAME: "Ao_wall_label",
         MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME: "Ao_WT",
-        
         # This key is now APPLICATION_STEPS and its value is a list of step objects
         MyocardiumSemanticRole.APPLICATION_STEPS: [
             {
@@ -57,8 +53,11 @@ _AORTIC_WALL_SCHEMATIC = {
 
 _PULMONARY_ARTERY_SCHEMATIC = {
     "labels": {
-        "PArt_BP_label": 7, "PArt_wall_label": 107, "RV_BP_label": 3,
-        "Ao_wall_label": 106, "Ao_BP_label": 6,
+        "PArt_BP_label": 7,
+        "PArt_wall_label": 107,
+        "RV_BP_label": 3,
+        "Ao_wall_label": 106,
+        "Ao_BP_label": 6,
     },
     "parameters": {"PArt_WT": 2.0},
     "semantic_map": {
@@ -67,8 +66,8 @@ _PULMONARY_ARTERY_SCHEMATIC = {
         MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME: "PArt_WT",
         MyocardiumSemanticRole.APPLICATION_STEPS: [
             {
-                "MODE": "REPLACE_EXCEPT", 
-                "RULE_LABEL_NAMES": ["RV_BP_label", "Ao_wall_label", "Ao_BP_label"]
+                "MODE": "REPLACE_EXCEPT",
+                "RULE_LABEL_NAMES": ["RV_BP_label", "Ao_wall_label", "Ao_BP_label"],
             }
         ],
     },
@@ -78,8 +77,8 @@ _RV_MYOCARDIUM_SCHEMATIC = {
     "labels": {
         "RV_BP_label": 3,
         "RV_myo_label": 103,
-        "Ao_wall_label": 106,        
-    }, 
+        "Ao_wall_label": 106,
+    },
     "parameters": {
         "RV_WT": 3.5,
     },
@@ -87,7 +86,6 @@ _RV_MYOCARDIUM_SCHEMATIC = {
         MyocardiumSemanticRole.SOURCE_BLOOD_POOL_NAME: "RV_BP_label",
         MyocardiumSemanticRole.TARGET_MYOCARDIUM_NAME: "RV_myo_label",
         MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME: "RV_WT",
-
         # This key is now APPLICATION_STEPS and its value is a list of step objects
         MyocardiumSemanticRole.APPLICATION_STEPS: [
             {
@@ -97,26 +95,24 @@ _RV_MYOCARDIUM_SCHEMATIC = {
                 ],
             }
         ],
-    }
+    },
 }
 
 _LA_MYOCARDIUM_SCHEMATIC = {
-    "labels": {"LA_BP_label": 4, "LA_myo_label": 104, "RA_BP_label": 5, "SVC_label": 13},
+    "labels": {
+        "LA_BP_label": 4,
+        "LA_myo_label": 104,
+        "RA_BP_label": 5,
+        "SVC_label": 13,
+    },
     "parameters": {"LA_WT": 2.0},
     "semantic_map": {
         MyocardiumSemanticRole.SOURCE_BLOOD_POOL_NAME: "LA_BP_label",
         MyocardiumSemanticRole.TARGET_MYOCARDIUM_NAME: "LA_myo_label",
         MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME: "LA_WT",
         MyocardiumSemanticRole.APPLICATION_STEPS: [
-            {
-                "MODE": "REPLACE_ONLY", 
-                "RULE_LABEL_NAMES": ["RA_BP_label"]
-            },
-            {
-                "MODE": "REPLACE_ONLY", 
-                "RULE_LABEL_NAMES": ["SVC_label"]
-            },
-
+            {"MODE": "REPLACE_ONLY", "RULE_LABEL_NAMES": ["RA_BP_label"]},
+            {"MODE": "REPLACE_ONLY", "RULE_LABEL_NAMES": ["SVC_label"]},
         ],
     },
 }
@@ -129,10 +125,7 @@ _RA_MYOCARDIUM_SCHEMATIC = {
         MyocardiumSemanticRole.TARGET_MYOCARDIUM_NAME: "RA_myo_label",
         MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME: "RA_WT",
         MyocardiumSemanticRole.APPLICATION_STEPS: [
-            {
-                "MODE": "REPLACE_ONLY", 
-                "RULE_LABEL_NAMES": ["RPV1_label"]
-            }
+            {"MODE": "REPLACE_ONLY", "RULE_LABEL_NAMES": ["RPV1_label"]}
         ],
     },
 }
@@ -140,18 +133,23 @@ _RA_MYOCARDIUM_SCHEMATIC = {
 # We only need to define the labels and parameters used in the push steps.
 # There is no semantic map for a "push" step as it's a direct logic call.
 _PUSH_IN_LABELS = {
-    "LA_myo_label": 104, "LA_BP_label": 4, "Ao_wall_label": 106,
-    "PArt_wall_label": 107, "PArt_BP_label": 7, "LV_myo_label": 2,
-    "RV_myo_label": 103, "RV_BP_label": 3
+    "LA_myo_label": 104,
+    "LA_BP_label": 4,
+    "Ao_wall_label": 106,
+    "PArt_wall_label": 107,
+    "PArt_BP_label": 7,
+    "LV_myo_label": 2,
+    "RV_myo_label": 103,
+    "RV_BP_label": 3,
 }
-_PUSH_IN_PARAMS = {
-    "LA_WT": 2.0, "PArt_WT": 2.0, "RV_WT": 3.5
-}
+_PUSH_IN_PARAMS = {"LA_WT": 2.0, "PArt_WT": 2.0, "RV_WT": 3.5}
 
 _PUSH_IN_SCHEMATIC = {
-    "labels": _PUSH_IN_LABELS, 
-    "parameters": _PUSH_IN_PARAMS
+    "labels": _PUSH_IN_LABELS,
+    "parameters": _PUSH_IN_PARAMS,
+    "semantic_map": {},  # no need for a semantic
 }
+
 
 # The class now inherits from the core scaffolder
 class ImageAnalysisScaffolder(ConfigScaffolder):
@@ -159,7 +157,7 @@ class ImageAnalysisScaffolder(ConfigScaffolder):
     Extends the core scaffolder to create fully-populated configuration files
     for specific image analysis workflow recipes.
     """
-    
+
     _COMPONENT_SCHEMATICS = {
         "lv_outflow": _LV_OUTFLOW_SCHEMATIC,
         "aortic_wall": _AORTIC_WALL_SCHEMATIC,
@@ -178,7 +176,7 @@ class ImageAnalysisScaffolder(ConfigScaffolder):
     ) -> None:
         """
         Generates a set of config files from a list of component schematics.
-        
+
         Args:
             output_dir: The directory where configuration files will be saved.
             component_names: A list of component names (e.g., ["aortic_wall"]).
@@ -212,8 +210,10 @@ class ImageAnalysisScaffolder(ConfigScaffolder):
         # REUSE the inherited _write_file method
         self._write_file(output_dir / "labels.yaml", labels_content, overwrite)
         self._write_file(output_dir / "parameters.json", params_content, overwrite)
-            
-        print(f"Scaffolding complete in '{output_dir.resolve()}' for: {', '.join(component_names)}")
+
+        print(
+            f"Scaffolding complete in '{output_dir.resolve()}' for: {', '.join(component_names)}"
+        )
 
     def create_labels_manifest(self, *args, **kwargs):
         """Override the base method to prevent confusion."""
@@ -221,3 +221,4 @@ class ImageAnalysisScaffolder(ConfigScaffolder):
             "Use scaffold_components() to generate a populated labels.yaml. "
             "Generating a template-based manifest is not supported by this scaffolder."
         )
+

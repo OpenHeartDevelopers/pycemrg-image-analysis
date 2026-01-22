@@ -14,6 +14,7 @@ from pycemrg_image_analysis.utilities import (
     MaskOperationMode,
 )
 
+
 class MyocardiumLogic:
     """
     Provides stateless logic for creating myocardial structures using a
@@ -46,8 +47,10 @@ class MyocardiumLogic:
         logging.info("1. Get names and parameters from the map")
         source_bp_name = semantic_map[MyocardiumSemanticRole.SOURCE_BLOOD_POOL_NAME]
         target_myo_name = semantic_map[MyocardiumSemanticRole.TARGET_MYOCARDIUM_NAME]
-        wt_param_name = semantic_map[MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME]
-        
+        wt_param_name = semantic_map[
+            MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME
+        ]
+
         # Get the list of application step dictionaries
         application_steps_data = semantic_map[MyocardiumSemanticRole.APPLICATION_STEPS]
 
@@ -68,40 +71,42 @@ class MyocardiumLogic:
         output_array = sitk.GetArrayFromImage(input_image)
         mask_array = sitk.GetArrayFromImage(new_wall_mask)
         dispatcher = self._get_mask_operation_dispatcher()
-        
+
         # The engine now iterates through the list of steps from the SEMANTIC MAP.
         for step_data in application_steps_data:
             # Parse the current step's data
             mode_enum = MaskOperationMode[step_data["MODE"]]
             rule_label_names = step_data["RULE_LABEL_NAMES"]
-            
+
             operation_func = dispatcher.get(mode_enum)
             if not operation_func:
-                raise NotImplementedError(f"Application mode '{mode_enum}' is not supported.")
-            
+                raise NotImplementedError(
+                    f"Application mode '{mode_enum}' is not supported."
+                )
+
             rule_label_values = label_manager.get_values_from_names(rule_label_names)
-            
+
             # This is a cleaner, more readable way to handle the different
             # keyword arguments required by the utility functions.
             kwargs_for_utility = {}
             if mode_enum == MaskOperationMode.REPLACE_EXCEPT:
-                kwargs_for_utility['except_these_values'] = rule_label_values
+                kwargs_for_utility["except_these_values"] = rule_label_values
             elif mode_enum == MaskOperationMode.REPLACE_ONLY:
-                kwargs_for_utility['only_override_these_values'] = rule_label_values
-            
+                kwargs_for_utility["only_override_these_values"] = rule_label_values
+
             # The output of one step becomes the input to the next.
             output_array = operation_func(
                 base_array=output_array,
                 mask_array=mask_array,
                 new_mask_value=target_myo_value,
-                **kwargs_for_utility # sends the correct kwarg based on mode 
+                **kwargs_for_utility,  # sends the correct kwarg based on mode
             )
 
         logging.info("5. Convert back to a SimpleITK image")
         output_image = sitk.GetImageFromArray(output_array)
         output_image.CopyInformation(input_image)
         return output_image
-    
+
     def push_structure(
         self, input_image: sitk.Image, contract: PushStructureContract
     ) -> sitk.Image:
@@ -121,16 +126,15 @@ class MyocardiumLogic:
             label_to_query=contract.pushed_bp_label,
             new_label_value=contract.pushed_wall_label,
         )
-        
+
         img_array = sitk.GetArrayFromImage(input_image)
 
         output_array = masks.add_masks_replace(
-            base_arryay=img_array, 
+            base_array=img_array,
             mask_array=corrected_mask,
-            new_mask_value=contract.pushed_wall_label
+            new_mask_value=contract.pushed_wall_label,
         )
 
         output_image = sitk.GetImageFromArray(output_array)
         output_image.CopyInformation(input_image)
         return output_image
-
