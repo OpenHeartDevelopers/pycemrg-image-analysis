@@ -61,3 +61,11 @@ class MyocardiumCreationContract:
     label_manager: LabelManager
     parameters: dict[str, float]  # e.g., {"Ao_WT": 2.5, "RV_WT": 3.0}
     output_path: Path
+
+@dataclass(frozen=True)
+class PushStructureContract:
+    """Contract for the 'push_structure' logic."""
+    pusher_wall_label: int
+    pushed_wall_label: int
+    pushed_bp_label: int
+    pushed_wall_thickness: float

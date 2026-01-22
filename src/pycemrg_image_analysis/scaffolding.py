@@ -10,6 +10,22 @@ from pycemrg.files import ConfigScaffolder
 from pycemrg_image_analysis.logic.constants import MyocardiumSemanticRole
 
 # schematics
+_LV_OUTFLOW_SCHEMATIC = {
+    "labels": {"LV_BP_label": 1, "LV_myo_label": 2},
+    "parameters": {"LV_neck_WT": 2.0},
+    "semantic_map": {
+        MyocardiumSemanticRole.SOURCE_BLOOD_POOL_NAME: "LV_BP_label",
+        MyocardiumSemanticRole.TARGET_MYOCARDIUM_NAME: "LV_myo_label",
+        MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME: "LV_neck_WT",
+        MyocardiumSemanticRole.APPLICATION_STEPS: [
+            {
+                "MODE": "ADD", 
+                "RULE_LABEL_NAMES": []
+             }
+        ],
+    },
+}
+
 _AORTIC_WALL_SCHEMATIC = {
     "labels": {
         "LV_BP_label": 1,
@@ -34,6 +50,25 @@ _AORTIC_WALL_SCHEMATIC = {
                     "LV_myo_label",
                     "Ao_BP_label",
                 ],
+            }
+        ],
+    },
+}
+
+_PULMONARY_ARTERY_SCHEMATIC = {
+    "labels": {
+        "PArt_BP_label": 7, "PArt_wall_label": 107, "RV_BP_label": 3,
+        "Ao_wall_label": 106, "Ao_BP_label": 6,
+    },
+    "parameters": {"PArt_WT": 2.0},
+    "semantic_map": {
+        MyocardiumSemanticRole.SOURCE_BLOOD_POOL_NAME: "PArt_BP_label",
+        MyocardiumSemanticRole.TARGET_MYOCARDIUM_NAME: "PArt_wall_label",
+        MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME: "PArt_WT",
+        MyocardiumSemanticRole.APPLICATION_STEPS: [
+            {
+                "MODE": "REPLACE_EXCEPT", 
+                "RULE_LABEL_NAMES": ["RV_BP_label", "Ao_wall_label", "Ao_BP_label"]
             }
         ],
     },
@@ -65,6 +100,39 @@ _RV_MYOCARDIUM_SCHEMATIC = {
     }
 }
 
+_LA_MYOCARDIUM_SCHEMATIC = {
+    "labels": {"LA_BP_label": 4, "LA_myo_label": 104, "RA_BP_label": 5, "SVC_label": 13},
+    "parameters": {"LA_WT": 2.0},
+    "semantic_map": {
+        MyocardiumSemanticRole.SOURCE_BLOOD_POOL_NAME: "LA_BP_label",
+        MyocardiumSemanticRole.TARGET_MYOCARDIUM_NAME: "LA_myo_label",
+        MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME: "LA_WT",
+        MyocardiumSemanticRole.APPLICATION_STEPS: [
+            {
+                "MODE": "REPLACE_ONLY", 
+                "RULE_LABEL_NAMES": ["RA_BP_label", "SVC_label"]
+            }
+        ],
+    },
+}
+
+_RA_MYOCARDIUM_SCHEMATIC = {
+    "labels": {"RA_BP_label": 5, "RA_myo_label": 105, "RPV1_label": 10},
+    "parameters": {"RA_WT": 2.0},
+    "semantic_map": {
+        MyocardiumSemanticRole.SOURCE_BLOOD_POOL_NAME: "RA_BP_label",
+        MyocardiumSemanticRole.TARGET_MYOCARDIUM_NAME: "RA_myo_label",
+        MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME: "RA_WT",
+        MyocardiumSemanticRole.APPLICATION_STEPS: [
+            {
+                "MODE": "REPLACE_ONLY", 
+                "RULE_LABEL_NAMES": ["RPV1_label"]
+            }
+        ],
+    },
+}
+
+
 # The class now inherits from the core scaffolder
 class ImageAnalysisScaffolder(ConfigScaffolder):
     """
@@ -73,8 +141,12 @@ class ImageAnalysisScaffolder(ConfigScaffolder):
     """
     
     _COMPONENT_SCHEMATICS = {
+        "lv_outflow": _LV_OUTFLOW_SCHEMATIC,
         "aortic_wall": _AORTIC_WALL_SCHEMATIC,
+        "pulmonary_artery": _PULMONARY_ARTERY_SCHEMATIC,
         "rv_myocardium": _RV_MYOCARDIUM_SCHEMATIC,
+        "la_myocardium": _LA_MYOCARDIUM_SCHEMATIC,
+        "ra_myocardium": _RA_MYOCARDIUM_SCHEMATIC,
     }
 
     def scaffold_components(

@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
-
+ZERO_LABEL = 0
 class MyocardiumSemanticRole(Enum):
     """
     Defines the abstract roles a label or parameter can play in myocardium creation.

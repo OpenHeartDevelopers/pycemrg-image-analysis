@@ -9,37 +9,37 @@ from pycemrg_image_analysis import ImageAnalysisScaffolder
 from pycemrg_image_analysis.logic import MyocardiumLogic, MyocardiumSemanticRole
 from pycemrg_image_analysis.utilities import save_image, load_image
 
-# --- Test Data Setup ---
-# This test requires the following files to exist in your test data directory:
-#
-# 1. myocardium_test/labels.yaml:
-#    labels:
-#      LV_BP_label: 1
-#      LV_myo_label: 2
-#      Ao_BP_label: 6
-#      Ao_wall_label: 106
-#
-# 2. myocardium_test/parameters.json:
-#    {
-#      "Ao_WT": 2.5
-#    }
-#
-# 3. myocardium_test/aortic_wall_map.json:
-#    {
-#      "SOURCE_BLOOD_POOL_NAME": "Ao_BP_label",
-#      "TARGET_MYOCARDIUM_NAME": "Ao_wall_label",
-#      "WALL_THICKNESS_PARAMETER_NAME": "Ao_WT",
-#      "APPLICATION_MODE": "REPLACE_EXCEPT",
-#      "APPLICATION_RULE_LABEL_NAMES": ["LV_BP_label", "LV_myo_label"]
-#    }
-#
-# 4. myocardium_test/seg_input.nrrd:
-#    A simple segmentation file to act as the input.
 
 def test_create_aortic_wall_from_map(test_data_root: Path, tmp_path: Path):
     """
     Integration test demonstrating the semantic map workflow for myocardium creation.
     """
+    # --- Test Data Setup ---
+    # This test requires the following files to exist in your test data directory:
+    #
+    # 1. myocardium_test/labels.yaml:
+    #    labels:
+    #      LV_BP_label: 1
+    #      LV_myo_label: 2
+    #      Ao_BP_label: 6
+    #      Ao_wall_label: 106
+    #
+    # 2. myocardium_test/parameters.json:
+    #    {
+    #      "Ao_WT": 2.5
+    #    }
+    #
+    # 3. myocardium_test/aortic_wall_map.json:
+    #    {
+    #      "SOURCE_BLOOD_POOL_NAME": "Ao_BP_label",
+    #      "TARGET_MYOCARDIUM_NAME": "Ao_wall_label",
+    #      "WALL_THICKNESS_PARAMETER_NAME": "Ao_WT",
+    #      "APPLICATION_MODE": "REPLACE_EXCEPT",
+    #      "APPLICATION_RULE_LABEL_NAMES": ["LV_BP_label", "LV_myo_label"]
+    #    }
+    #
+    # 4. myocardium_test/seg_input.nrrd:
+    #    A simple segmentation file to act as the input.
     # --- 1. ARRANGE: The Orchestrator loads ALL configuration into memory ---
     test_dir = test_data_root / "myocardium_test"
     output_dir = tmp_path / "test_myocardium"

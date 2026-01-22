@@ -1,17 +1,18 @@
 # src/pycemrg_image_analysis/logic/myocardium.py
 
 import logging
+import numpy as np
 import SimpleITK as sitk
 
 from pycemrg.data.labels import LabelManager
 
 from pycemrg_image_analysis.logic.constants import MyocardiumSemanticRole
+from pycemrg_image_analysis.logic.contracts import PushStructureContract
 from pycemrg_image_analysis.utilities import (
     filters,
     masks,
     MaskOperationMode,
 )
-
 
 class MyocardiumLogic:
     """
@@ -28,6 +29,7 @@ class MyocardiumLogic:
         return {
             MaskOperationMode.REPLACE_EXCEPT: masks.add_masks_replace_except,
             MaskOperationMode.REPLACE_ONLY: masks.add_masks_replace_only,
+            MaskOperationMode.ADD: masks.add_masks,
             # Future utility functions will be registered here.
         }
 
@@ -92,10 +94,42 @@ class MyocardiumLogic:
                 base_array=output_array,
                 mask_array=mask_array,
                 new_mask_value=target_myo_value,
-                **kwargs_for_utility
+                **kwargs_for_utility # sends the correct kwarg based on mode 
             )
 
         logging.info("5. Convert back to a SimpleITK image")
+        output_image = sitk.GetImageFromArray(output_array)
+        output_image.CopyInformation(input_image)
+        return output_image
+    
+    def push_structure(
+        self, input_image: sitk.Image, contract: PushStructureContract
+    ) -> sitk.Image:
+        """Refactors the legacy 'push_inside' workflow."""
+        # This logic is a direct, stateless translation of ImageAnalysis.push_inside
+        dist_map = filters.distance_map(
+            input_image, contract.pusher_wall_label, use_image_spacing=True
+        )
+        # The threshold now correctly creates a shell
+        new_pushed_wall_mask = filters.threshold_filter(
+            dist_map, lower=0, upper=contract.pushed_wall_thickness, binarise=True
+        )
+
+        corrected_mask = filters.and_filter(
+            image=input_image,
+            mask=new_pushed_wall_mask,
+            label_to_query=contract.pushed_bp_label,
+            new_label_value=contract.pushed_wall_label,
+        )
+        
+        img_array = sitk.GetArrayFromImage(input_image)
+
+        output_array = masks.add_masks_replace(
+            base_arryay=img_array, 
+            mask_array=corrected_mask,
+            new_mask_value=contract.pushed_wall_label
+        )
+
         output_image = sitk.GetImageFromArray(output_array)
         output_image.CopyInformation(input_image)
         return output_image

@@ -8,7 +8,7 @@ import SimpleITK as sitk
 from pathlib import Path
 from enum import Enum, auto
 
-ZERO_LABEL = 0
+from pycemrg_image_analysis.logic.constants import ZERO_LABEL
 
 # This enum is critical for our rule-based logic
 class MaskOperationMode(Enum):
@@ -16,6 +16,44 @@ class MaskOperationMode(Enum):
     REPLACE_EXCEPT = auto()
     REPLACE_ONLY = auto()
     ADD = auto()
+
+def add_masks(
+    base_array: np.ndarray, 
+    mask_array: np.ndarray, 
+    new_mask_value: int,
+) -> np.ndarray:
+    """
+    Apply a mask (mask_array) to an image array without overriding any pixels that already belong to the image array.
+    Parameters:
+        base_array (np.ndarray): The first input image array.
+        mask_array (np.ndarray): The second input image array.
+        new_mask_value: The value to assign to the pixels in base_array that are not already part of the image array.
+    Returns:
+        np.ndarray: The resulting image array after applying the mask.
+    """
+    if base_array.shape != mask_array.shape:
+        # A common issue in legacy code, handle it explicitly.
+        raise ValueError("Input and mask arrays must have the same shape.")
+    
+    output_array = np.copy(base_array)
+
+    update_region = (mask_array != ZERO_LABEL) & (base_array == ZERO_LABEL)
+    output_array[update_region] = new_mask_value
+
+    return output_array
+
+def add_masks_replace(
+    base_array: np.ndarray, 
+    mask_array: np.ndarray,
+    new_mask_value: int,
+) -> np.ndarray:
+    
+    output_array = np.copy(base_array)
+
+    update_region = mask_array != ZERO_LABEL
+    output_array[update_region] = new_mask_value
+    
+    return output_array
 
 def add_masks_replace_only(
     base_array: np.ndarray, 
@@ -29,8 +67,8 @@ def add_masks_replace_only(
         Parameters:
             imga_array (np.ndarray): The first input image array.
             imgb_array (np.ndarray): The second input image array.
-            newmask: The value to assign to the pixels in imga_array that belong to the mask.
-            only_override_this: The value of pixels in imga_array that should be overridden with the newmask.
+            new_mask_value: The value to assign to the pixels in imga_array that belong to the mask.
+            only_override_this: The value of pixels in imga_array that should be overridden with the new_mask_value.
 
         Returns:
             np.ndarray: The resulting image array after applying the mask and replacing the pixels.

@@ -1,6 +1,26 @@
 # src/pycemrg_image_analysis/utilities/filters.py
 import logging
+
+import numpy as np
 import SimpleITK as sitk
+
+from pycemrg_image_analysis.logic.constants import ZERO_LABEL
+
+def and_filter(
+    image: sitk.Image,
+    mask: sitk.Image,
+    label_to_query: int,
+    new_label_value: int,
+) -> np.ndarray:
+    img_array = sitk.GetArrayFromImage(image)
+    mask_array = sitk.GetArrayFromImage(mask)
+
+    indices = np.where(mask_array != ZERO_LABEL)
+    corrected_mask = np.zeros_like(img_array)
+    is_bp = img_array[indices] == label_to_query
+    corrected_mask[indices] = np.where(is_bp, new_label_value, ZERO_LABEL)
+
+    return corrected_mask
 
 
 def distance_map(

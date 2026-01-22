@@ -6,22 +6,28 @@ logic engines and the convenience builders.
 """
 
 from pycemrg_image_analysis.logic.builders import SegmentationPathBuilder, MyocardiumPathBuilder  
-from pycemrg_image_analysis.logic.constants import MyocardiumSemanticRole
+from pycemrg_image_analysis.logic.constants import MyocardiumSemanticRole, ZERO_LABEL
 from pycemrg_image_analysis.logic.contracts import (
     CylinderCreationContract,
     MyocardiumRule,
     MyocardiumCreationContract,
+    PushStructureContract,
 )
 from .segmentation import SegmentationLogic
 from .myocardium import MyocardiumLogic
 
 __all__ = [
+    # Builders 
     "SegmentationPathBuilder",
     "MyocardiumPathBuilder",  
-    "CylinderCreationContract",
+    # Constants
     "MyocardiumRule",
+    "MyocardiumSemanticRole", 
+    # Contracts
+    "CylinderCreationContract",
     "MyocardiumCreationContract",
+    "PushStructureContract",
+    # Logic Engines
     "SegmentationLogic",
     "MyocardiumLogic",
-    "MyocardiumSemanticRole", 
 ]
