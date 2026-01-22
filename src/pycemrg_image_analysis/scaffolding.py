@@ -110,8 +110,13 @@ _LA_MYOCARDIUM_SCHEMATIC = {
         MyocardiumSemanticRole.APPLICATION_STEPS: [
             {
                 "MODE": "REPLACE_ONLY", 
-                "RULE_LABEL_NAMES": ["RA_BP_label", "SVC_label"]
-            }
+                "RULE_LABEL_NAMES": ["RA_BP_label"]
+            },
+            {
+                "MODE": "REPLACE_ONLY", 
+                "RULE_LABEL_NAMES": ["SVC_label"]
+            },
+
         ],
     },
 }
@@ -132,6 +137,21 @@ _RA_MYOCARDIUM_SCHEMATIC = {
     },
 }
 
+# We only need to define the labels and parameters used in the push steps.
+# There is no semantic map for a "push" step as it's a direct logic call.
+_PUSH_IN_LABELS = {
+    "LA_myo_label": 104, "LA_BP_label": 4, "Ao_wall_label": 106,
+    "PArt_wall_label": 107, "PArt_BP_label": 7, "LV_myo_label": 2,
+    "RV_myo_label": 103, "RV_BP_label": 3
+}
+_PUSH_IN_PARAMS = {
+    "LA_WT": 2.0, "PArt_WT": 2.0, "RV_WT": 3.5
+}
+
+_PUSH_IN_SCHEMATIC = {
+    "labels": _PUSH_IN_LABELS, 
+    "parameters": _PUSH_IN_PARAMS
+}
 
 # The class now inherits from the core scaffolder
 class ImageAnalysisScaffolder(ConfigScaffolder):
@@ -147,6 +167,7 @@ class ImageAnalysisScaffolder(ConfigScaffolder):
         "rv_myocardium": _RV_MYOCARDIUM_SCHEMATIC,
         "la_myocardium": _LA_MYOCARDIUM_SCHEMATIC,
         "ra_myocardium": _RA_MYOCARDIUM_SCHEMATIC,
+        "myo_push_steps": _PUSH_IN_SCHEMATIC,
     }
 
     def scaffold_components(
