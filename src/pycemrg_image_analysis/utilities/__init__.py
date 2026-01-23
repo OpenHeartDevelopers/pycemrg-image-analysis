@@ -17,6 +17,7 @@ from pycemrg_image_analysis.utilities.filters import (
     distance_map, 
     threshold_filter
 )
+from pycemrg_image_analysis.utilities.dispatchers import get_mask_operation_dispatcher
 
 __all__ = [
     # IO Utilities
@@ -34,5 +35,7 @@ __all__ = [
     "and_filter",
     "distance_map",
     "threshold_filter",
+    # Dispatchers
+    "get_mask_operation_dispatcher",
 ]
 

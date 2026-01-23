@@ -11,6 +11,7 @@ from pycemrg_image_analysis.logic.contracts import PushStructureContract
 from pycemrg_image_analysis.utilities import (
     filters,
     masks,
+    get_mask_operation_dispatcher,
     MaskOperationMode,
 )
 
@@ -20,19 +21,6 @@ class MyocardiumLogic:
     Provides stateless logic for creating myocardial structures using a
     generic, rule-based engine configured by a semantic map.
     """
-
-    # helpers
-    def _get_mask_operation_dispatcher(self) -> dict:
-        """
-        Returns a dispatch dictionary mapping operation modes to utility functions.
-        This avoids the ugly if/elif/else block.
-        """
-        return {
-            MaskOperationMode.REPLACE_EXCEPT: masks.add_masks_replace_except,
-            MaskOperationMode.REPLACE_ONLY: masks.add_masks_replace_only,
-            MaskOperationMode.ADD: masks.add_masks,
-            # Future utility functions will be registered here.
-        }
 
     def create_from_semantic_map(
         self,
@@ -70,7 +58,7 @@ class MyocardiumLogic:
         logging.info("4. Apply the sequence of application steps")
         output_array = sitk.GetArrayFromImage(input_image)
         mask_array = sitk.GetArrayFromImage(new_wall_mask)
-        dispatcher = self._get_mask_operation_dispatcher()
+        dispatcher = get_mask_operation_dispatcher()
 
         # The engine now iterates through the list of steps from the SEMANTIC MAP.
         for step_data in application_steps_data:
