@@ -21,6 +21,7 @@ from pycemrg_image_analysis.utilities.filters import (
     distance_map, 
     threshold_filter
 )
+from pycemrg_image_analysis.utilities.dispatchers import get_mask_operation_dispatcher
 
 __all__ = [
     # IO Utilities
@@ -41,5 +42,7 @@ __all__ = [
     # Spatial Utilities
     "compute_target_shape",
     "compute_actual_spacing",
+    # Dispatchers
+    "get_mask_operation_dispatcher",
 ]
 

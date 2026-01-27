@@ -7,7 +7,7 @@ from typing import Union
 
 # Import the base class we will be extending
 from pycemrg.files import ConfigScaffolder
-from pycemrg_image_analysis.logic.constants import MyocardiumSemanticRole
+from pycemrg_image_analysis.logic.constants import MyocardiumSemanticRole, ValveSemanticRole
 
 # schematics
 _LV_OUTFLOW_SCHEMATIC = {
@@ -150,6 +150,84 @@ _PUSH_IN_SCHEMATIC = {
     "semantic_map": {},  # no need for a semantic
 }
 
+# Valve schematics
+_MITRAL_VALVE_SCHEMATIC = {
+    "labels": {
+        "LA_BP_label": 4,
+        "LV_BP_label": 1,
+        "MV_label": 201,
+    },
+    "parameters": {
+        "valve_WT": 4.0, # This is a multiplier in legacy, but we'll treat it as a direct mm value
+    },
+    "semantic_map": {
+        # These keys now correspond to the ValveSemanticRole Enum
+        ValveSemanticRole.STRUCTURE_A_NAME: "LA_BP_label",
+        ValveSemanticRole.STRUCTURE_B_NAME: "LV_BP_label",
+        ValveSemanticRole.TARGET_VALVE_NAME: "MV_label",
+        ValveSemanticRole.INTERSECTION_THICKNESS_PARAMETER_NAME: "valve_WT",
+        ValveSemanticRole.APPLICATION_STEPS: [
+            {
+                "MODE": "REPLACE",
+                "RULE_LABEL_NAMES": [], # REPLACE doesn't need any rule labels
+            }
+        ],
+    },
+}
+
+_AORTIC_VALVE_SCHEMATIC = {
+    "labels": {
+        "Ao_BP_label": 6,
+        "LV_BP_label": 1,
+        "AV_label": 203,
+    },
+    "parameters": {
+        "valve_WT": 4.0,
+    },
+    "semantic_map": {
+        ValveSemanticRole.STRUCTURE_A_NAME: "Ao_BP_label",
+        ValveSemanticRole.STRUCTURE_B_NAME: "LV_BP_label",
+        ValveSemanticRole.TARGET_VALVE_NAME: "AV_label",
+        ValveSemanticRole.INTERSECTION_THICKNESS_PARAMETER_NAME: "valve_WT",
+        ValveSemanticRole.APPLICATION_STEPS: [{"MODE": "REPLACE", "RULE_LABEL_NAMES": []}],
+    },
+}
+
+_PULMONARY_VALVE_SCHEMATIC = {
+    "labels": {
+        "PArt_BP_label": 7,
+        "RV_BP_label": 3,
+        "PV_label": 204,
+    },
+    "parameters": {
+        "valve_WT": 4.0,
+    },
+    "semantic_map": {
+        ValveSemanticRole.STRUCTURE_A_NAME: "PArt_BP_label",
+        ValveSemanticRole.STRUCTURE_B_NAME: "RV_BP_label",
+        ValveSemanticRole.TARGET_VALVE_NAME: "PV_label",
+        ValveSemanticRole.INTERSECTION_THICKNESS_PARAMETER_NAME: "valve_WT",
+        ValveSemanticRole.APPLICATION_STEPS: [{"MODE": "REPLACE", "RULE_LABEL_NAMES": []}],
+    },
+}
+
+_TRICUSPID_VALVE_SCHEMATIC = {
+    "labels": {
+        "RA_BP_label": 5,
+        "RV_BP_label": 3,
+        "TV_label": 202,
+    },
+    "parameters": {
+        "valve_WT": 4.0,
+    },
+    "semantic_map": {
+        ValveSemanticRole.STRUCTURE_A_NAME: "RA_BP_label",
+        ValveSemanticRole.STRUCTURE_B_NAME: "RV_BP_label",
+        ValveSemanticRole.TARGET_VALVE_NAME: "TV_label",
+        ValveSemanticRole.INTERSECTION_THICKNESS_PARAMETER_NAME: "valve_WT",
+        ValveSemanticRole.APPLICATION_STEPS: [{"MODE": "REPLACE", "RULE_LABEL_NAMES": []}],
+    },
+}
 
 # The class now inherits from the core scaffolder
 class ImageAnalysisScaffolder(ConfigScaffolder):
@@ -166,6 +244,10 @@ class ImageAnalysisScaffolder(ConfigScaffolder):
         "la_myocardium": _LA_MYOCARDIUM_SCHEMATIC,
         "ra_myocardium": _RA_MYOCARDIUM_SCHEMATIC,
         "myo_push_steps": _PUSH_IN_SCHEMATIC,
+        "mitral_valve": _MITRAL_VALVE_SCHEMATIC, 
+        "aortic_valve": _AORTIC_VALVE_SCHEMATIC,
+        "pulmonary_valve": _PULMONARY_VALVE_SCHEMATIC,
+        "tricuspid_valve": _TRICUSPID_VALVE_SCHEMATIC,
     }
 
     def scaffold_components(

@@ -49,18 +49,23 @@ class MyocardiumRule:
 
 
 @dataclass(frozen=True)
-class MyocardiumCreationContract:
-    """
+class CreationContract:
+    """A generic base contract for 'create from map' style logic."""
+    input_image: sitk.Image
+    label_manager: LabelManager
+    parameters: dict[str, float]
+    output_path: Path
+
+@dataclass(frozen=True)
+class MyocardiumCreationContract(CreationContract):
+    """Specific contract for myocardium creation, adding the rule.
+    
     The single, generic contract for all myocardium creation tasks.
 
     This object bundles the input data (image), the specific rule for this run,
     the necessary tools (label_manager, parameters), and the output path.
     """
-    input_image: sitk.Image
     rule: MyocardiumRule
-    label_manager: LabelManager
-    parameters: dict[str, float]  # e.g., {"Ao_WT": 2.5, "RV_WT": 3.0}
-    output_path: Path
 
 @dataclass(frozen=True)
 class PushStructureContract:
@@ -69,3 +74,17 @@ class PushStructureContract:
     pushed_wall_label: int
     pushed_bp_label: int
     pushed_wall_thickness: float
+
+@dataclass(frozen=True)
+class ValveRule:
+    """Defines the recipe for building one valve via intersection."""
+    structure_a_name: str
+    structure_b_name: str
+    target_valve_name: str
+    intersection_thickness_parameter_name: str
+    application_steps: list[ApplicationStep]
+
+@dataclass(frozen=True)
+class ValveCreationContract(CreationContract):
+    """Specific contract for valve creation, adding the rule."""
+    rule: ValveRule

@@ -23,3 +23,12 @@ class MyocardiumSemanticRole(Enum):
     # mask application step (mode, labels, etc.).
     APPLICATION_STEPS = auto()
 
+class ValveSemanticRole(Enum):
+    """
+    Defines the abstract roles a label or parameter can play in valve creation.
+    """
+    STRUCTURE_A_NAME = auto()
+    STRUCTURE_B_NAME = auto()
+    TARGET_VALVE_NAME = auto()
+    INTERSECTION_THICKNESS_PARAMETER_NAME = auto()
+    APPLICATION_STEPS = auto()
