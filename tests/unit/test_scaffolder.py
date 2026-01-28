@@ -54,7 +54,13 @@ def test_scaffold_components_single_component(tmp_path: Path):
         map_data = json.load(f)
         # Check that the Enum member was correctly converted to a string key
         assert map_data[MyocardiumSemanticRole.SOURCE_BLOOD_POOL_NAME.name] == "Ao_BP_label"
-        assert map_data[MyocardiumSemanticRole.APPLICATION_MODE.name] == "REPLACE_EXCEPT"
+        
+        assert MyocardiumSemanticRole.APPLICATION_STEPS.name in map_data
+        
+        application_steps = map_data[MyocardiumSemanticRole.APPLICATION_STEPS.name]
+        assert isinstance(application_steps, list)
+        assert application_steps[0]["MODE"] == "REPLACE_EXCEPT"
+
 
 def test_scaffold_raises_error_for_unknown_component(tmp_path: Path):
     """
