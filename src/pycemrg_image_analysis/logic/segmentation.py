@@ -35,7 +35,7 @@ class SegmentationLogic:
         """
         # 1. Call the pure utility function to do the heavy lifting
         cylinder_mask_array = calculate_cylinder_mask(
-            image_shape=contract.image_shape,
+            image_shape=(contract.image_shape[2], contract.image_shape[1], contract.image_shape[0]), # Convert (x,y,z) to (z,y,x)
             origin=contract.origin,
             spacing=contract.spacing,
             points=contract.points,
@@ -44,11 +44,8 @@ class SegmentationLogic:
         )
 
         # 2. Convert the NumPy array result to a SimpleITK image
-        # Note: SimpleITK expects the array shape in (z, y, x) order, but our
-        # calculation was done in (x, y, z). We need to transpose the array.
-        # This is a common point of error we are handling explicitly.
-        cylinder_mask_array_transposed = np.transpose(cylinder_mask_array, (2, 1, 0))
-        cylinder_image = sitk.GetImageFromArray(cylinder_mask_array_transposed)
+        # Note: SimpleITK expects the array shape in (z, y, x) order, which matches our output
+        cylinder_image = sitk.GetImageFromArray(cylinder_mask_array)
 
         # 3. Set the physical space metadata on the new image
         # converting contract origin/spacing to lists, which SimpleITK expects

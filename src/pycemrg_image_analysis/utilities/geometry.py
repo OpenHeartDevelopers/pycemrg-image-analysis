@@ -8,8 +8,9 @@ import SimpleITK as sitk
 from pathlib import Path
 from typing import Tuple
 
+
 def calculate_cylinder_mask(
-    image_shape: Tuple[int, int, int],
+    image_shape: Tuple[int, int, int],  # (depth, height, width)
     origin: np.ndarray,
     spacing: np.ndarray,
     points: np.ndarray,
@@ -19,26 +20,21 @@ def calculate_cylinder_mask(
     """
     Generates a cylindrical mask based on geometric and physical parameters.
 
-    This is a pure, stateless function refactored from the legacy
-    FourChamberProcess.cylinder_process method. It operates solely on input
-    data and returns a numpy array, with no knowledge of file paths.
+    Assumes a (Z, Y, X) axis convention for the image_shape and output array.
 
     Args:
-        image_shape: The shape of the target image space (e.g., (nx, ny, nz)).
+        image_shape: The shape of the target image space in (depth, height, width).
         origin: The physical origin (x, y, z) of the image.
-        spacing: The physical spacing between pixels/voxels.
-        points: A NumPy array of points defining the plane for the cylinder's center.
+        spacing: The physical spacing between pixels/voxels (x, y, z).
+        points: A NumPy array of points (3, 3) defining the plane.
         slicer_radius: The radius of the cylinder in physical units.
         slicer_height: The height of the cylinder in physical units.
 
     Returns:
-        A NumPy array of type uint8 with the same shape as image_shape,
-        where the cylindrical region is marked with a value of 1.
+        A NumPy array of type uint8 with shape (depth, height, width).
     """
-    # Create the output array, ensuring the shape is in the correct order.
-    # Legacy code often used (nx, ny, nz) while numpy uses (nz, ny, nx).
-    # We will assume the input image_shape is (nx, ny, nz) and work with that.
     cylinder_mask = np.zeros(image_shape, dtype=np.uint8)
+    depth, height, width = image_shape
 
     # Convert voxel-based points to world coordinates
     points_coords = origin + spacing * points
@@ -56,30 +52,29 @@ def calculate_cylinder_mask(
     p2 = cog + normal * slicer_height / 2.0
     n = p2 - p1
 
-    # Optimize search by defining a bounding box around the cylinder
+    # Bounding box calculation must now respect the different array/physical ordering
+    # Spacing and origin are (x,y,z), but image_shape is (z,y,x)
+    physical_shape = np.array([width, height, depth])
+    physical_max_bounds = origin + (physical_shape - 1) * spacing
+    
     cube_size = max(slicer_height, slicer_radius) + (2 * np.max(spacing))
-    min_bounds = cog - cube_size / 2.0
-    max_bounds = cog + cube_size / 2.0
+    min_bounds_phys = np.maximum(cog - cube_size / 2.0, origin)
+    max_bounds_phys = np.minimum(cog + cube_size / 2.0, physical_max_bounds)
 
-    # Convert physical bounds to voxel indices
-    min_indices = np.maximum(np.floor((min_bounds - origin) / spacing).astype(int), 0)
-    max_indices = np.minimum(np.ceil((max_bounds - origin) / spacing).astype(int), image_shape)
-
-    # Iterate only within the bounding box
-    for i in range(min_indices[0], max_indices[0]):
-        for j in range(min_indices[1], max_indices[1]):
-            for k in range(min_indices[2], max_indices[2]):
+    min_indices_phys = np.floor((min_bounds_phys - origin) / spacing).astype(int)
+    max_indices_phys = np.ceil((max_bounds_phys - origin) / spacing).astype(int)
+    
+    # Iterate using (x, y, z) physical indices
+    for k in range(min_indices_phys[2], max_indices_phys[2]):
+        for j in range(min_indices_phys[1], max_indices_phys[1]):
+            for i in range(min_indices_phys[0], max_indices_phys[0]):
                 test_point = origin + spacing * np.array([i, j, k])
                 v_p1_to_test = test_point - p1
-                v_p2_to_test = test_point - p2
 
-                # Check if the point is between the two end planes of the cylinder
-                if np.dot(v_p1_to_test, n) >= 0 and np.dot(v_p2_to_test, n) <= 0:
-                    # Check if the point is within the radius
-                    distance_from_axis = np.linalg.norm(
-                        np.cross(v_p1_to_test, n)
-                    ) / np.linalg.norm(n)
+                if np.dot(v_p1_to_test, n) >= 0 and np.dot(test_point - p2, n) <= 0:
+                    distance_from_axis = np.linalg.norm(np.cross(v_p1_to_test, n)) / np.linalg.norm(n)
                     if distance_from_axis <= slicer_radius:
-                        cylinder_mask[i, j, k] = 1
+                        # Assign to the (z, y, x) array using the correct indices
+                        cylinder_mask[k, j, i] = 1
 
     return cylinder_mask

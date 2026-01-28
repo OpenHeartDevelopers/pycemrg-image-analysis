@@ -23,6 +23,16 @@ from pycemrg_image_analysis.utilities.filters import (
 )
 from pycemrg_image_analysis.utilities.dispatchers import get_mask_operation_dispatcher
 
+from pycemrg_image_analysis.utilities.intensity import (
+    clip_intensities,
+    normalize_min_max,
+    normalize_percentile,
+)
+
+from pycemrg_image_analysis.utilities.artifact_simulation import downsample_volume
+
+from .sampling import extract_center_patch, extract_random_patch
+
 __all__ = [
     # IO Utilities
     "load_image",
@@ -44,5 +54,16 @@ __all__ = [
     "compute_actual_spacing",
     # Dispatchers
     "get_mask_operation_dispatcher",
+    # Intensity Utilities
+    "clip_intensities",
+    "normalize_min_max",
+    "normalize_percentile",
+    # Artifact Simulation
+    "downsample_volume",
+    # Sampling Utilities
+    "extract_center_patch",
+    "extract_random_patch",
 ]
+
+
 
