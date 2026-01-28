@@ -4,6 +4,7 @@ from pycemrg_image_analysis.utilities.io import load_image, save_image
 from pycemrg_image_analysis.utilities.spatial import (
     compute_target_shape,
     compute_actual_spacing,
+    resample_to_isotropic,
 )
 from pycemrg_image_analysis.utilities.geometry import calculate_cylinder_mask
 from pycemrg_image_analysis.utilities.masks import (
@@ -49,6 +50,7 @@ __all__ = [
     # Spatial Utilities
     "compute_target_shape",
     "compute_actual_spacing",
+    "resample_to_isotropic",
     # Dispatchers
     "get_mask_operation_dispatcher",
     # Intensity Utilities

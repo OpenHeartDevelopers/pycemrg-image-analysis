@@ -2,6 +2,7 @@
 
 import logging
 import numpy as np
+import SimpleITK as sitk
 from typing import Tuple
 
 
@@ -49,3 +50,28 @@ def compute_actual_spacing(
         for orig_space, orig_dim, tgt_dim
         in zip(original_spacing, original_shape, target_shape)
     )
+
+def resample_to_isotropic(image: sitk.Image, target_spacing: float = 1.0) -> sitk.Image:
+    """
+    Resample an image to isotropic spacing (x=y=z).
+    """
+    original_size = image.GetSize()
+    original_spacing = image.GetSpacing()
+    
+    new_spacing = (target_spacing, target_spacing, target_spacing)
+    
+    new_size = [
+        int(round(osz * ospc / nspc))
+        for osz, ospc, nspc in zip(original_size, original_spacing, new_spacing)
+    ]
+    
+    resampler = sitk.ResampleImageFilter()
+    resampler.SetOutputSpacing(new_spacing)
+    resampler.SetSize(new_size)
+    resampler.SetOutputDirection(image.GetDirection())
+    resampler.SetOutputOrigin(image.GetOrigin())
+    resampler.SetTransform(sitk.Transform())
+    resampler.SetDefaultPixelValue(image.GetPixelIDValue())
+    resampler.SetInterpolator(sitk.sitkLinear)
+    
+    return resampler.Execute(image)
