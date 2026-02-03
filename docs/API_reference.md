@@ -73,3 +73,62 @@ After the loop is complete, use the `utilities.save_image` function to write the
 *   **Key Methods for Orchestrator:**
     *   `utilities.load_image(path: Path) -> sitk.Image`
     *   `utilities.save_image(image: sitk.Image, path: Path)`
+
+## `pycemrg_image_analysis.utilities.metrics`
+
+Image quality metrics for volume comparison and validation. All functions expect pre-normalized `[0, 1]` data in `(Z, Y, X)` format.
+
+### Quick Reference
+
+| Function | Purpose | Key Parameters | Returns |
+|----------|---------|----------------|---------|
+| `compute_mse()` | Mean Squared Error | `predicted`, `ground_truth` | `float` (lower is better) |
+| `compute_psnr()` | Peak Signal-to-Noise Ratio | `predicted`, `ground_truth`, `data_range=1.0` | `float` in dB (20-50 typical) |
+| `compute_ssim()` | Structural Similarity Index | `predicted`, `ground_truth`, `win_size=7` | `float` in [0, 1] (>0.9 excellent) |
+| `compute_gradient_error()` | Edge sharpness preservation | `predicted`, `ground_truth`, `axis=0` | `float` (lower is better) |
+| `compare_volumes()` | Batch metric computation | `predicted`, `ground_truth`, `metrics=None` | `dict[str, float]` |
+
+### Core Functions
+
+#### `compute_mse(predicted, ground_truth) -> float`
+Mean Squared Error between volumes. Returns 0.0 for identical volumes.
+
+#### `compute_psnr(predicted, ground_truth, data_range=1.0) -> float`
+Peak Signal-to-Noise Ratio in dB. Returns `inf` for identical volumes.
+
+#### `compute_ssim(predicted, ground_truth, data_range=1.0, win_size=7, **kwargs) -> float`
+3D Structural Similarity Index. Values: `>0.9` excellent, `0.7-0.9` good, `<0.7` poor.
+
+**Note:** For thin slices with anisotropic spacing, use smaller `win_size=3`.
+
+#### `compute_gradient_error(predicted, ground_truth, axis=0) -> float`
+Mean absolute gradient error along specified axis (0=Z, 1=Y, 2=X). Useful for interpolation quality assessment.
+
+#### `compare_volumes(predicted, ground_truth, data_range=1.0, metrics=None) -> Dict[str, float]`
+Compute multiple metrics efficiently.
+
+**Default metrics:** `['mse', 'psnr', 'ssim', 'gradient']`
+
+**Available metrics:** `'mse'`, `'psnr'`, `'ssim'`, `'gradient'` (Z-axis), `'gradient_x'`, `'gradient_y'`, `'gradient_z'`
+
+### Example Usage
+
+```python
+from pycemrg_image_analysis.utilities.metrics import compare_volumes
+
+# Validate interpolation results
+results = compare_volumes(interpolated, ground_truth, metrics=['mse', 'psnr', 'ssim'])
+print(f"PSNR: {results['psnr']:.2f} dB, SSIM: {results['ssim']:.4f}")
+
+# Test Z-axis gradient preservation
+from pycemrg_image_analysis.utilities.metrics import compute_gradient_error
+z_error = compute_gradient_error(interpolated, ground_truth, axis=0)
+```
+
+### Design Notes
+- All inputs must be pre-normalized to `[0, 1]` range
+- Arrays must follow `(Z, Y, X)` convention
+- Shape mismatches raise `ValueError`
+- Returns Python `float`, not NumPy scalars
+
+**Full API:** See `metrics_api.md` for detailed documentation.
