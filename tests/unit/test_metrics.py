@@ -31,15 +31,15 @@ from pycemrg_image_analysis.utilities.metrics import (
 def simple_volumes():
     """Small volumes for fast testing."""
     np.random.seed(42)
-    predicted = np.random.rand(4, 8, 8).astype(np.float32)
-    ground_truth = np.random.rand(4, 8, 8).astype(np.float32)
+    predicted = np.random.rand(8, 16, 16).astype(np.float32)
+    ground_truth = np.random.rand(8, 16, 16).astype(np.float32)
     return predicted, ground_truth
 
 
 @pytest.fixture
 def identical_volumes():
     """Identical volumes for testing PSNR=inf and SSIM=1.0."""
-    volume = np.random.rand(4, 8, 8).astype(np.float32)
+    volume = np.random.rand(8, 16, 16).astype(np.float32)
     return volume, volume.copy()
 
 
@@ -213,10 +213,10 @@ def test_ssim_range(simple_volumes):
 
 def test_ssim_winsize_validation():
     """SSIM should raise ValueError if win_size > min dimension."""
-    pred = np.random.rand(4, 8, 8)
+    pred = np.random.rand(4, 8, 8)  # Min dimension is 4
     gt = np.random.rand(4, 8, 8)
 
-    # Minimum dimension is 4, win_size=7 should fail
+    # win_size=7 should fail when min_dim=4
     with pytest.raises(ValueError, match="win_size.*cannot be larger"):
         compute_ssim(pred, gt, win_size=7)
 
