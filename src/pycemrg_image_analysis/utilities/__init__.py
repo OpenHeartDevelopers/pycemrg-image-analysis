@@ -8,16 +8,16 @@ from pycemrg_image_analysis.utilities.spatial import (
 )
 from pycemrg_image_analysis.utilities.geometry import calculate_cylinder_mask
 from pycemrg_image_analysis.utilities.masks import (
-    MaskOperationMode, 
+    MaskOperationMode,
     add_masks,
     add_masks_replace,
-    add_masks_replace_except, 
-    add_masks_replace_only
+    add_masks_replace_except,
+    add_masks_replace_only,
 )
 from pycemrg_image_analysis.utilities.filters import (
-    and_filter, 
-    distance_map, 
-    threshold_filter
+    and_filter,
+    distance_map,
+    threshold_filter,
 )
 from pycemrg_image_analysis.utilities.dispatchers import get_mask_operation_dispatcher
 
@@ -29,7 +29,19 @@ from pycemrg_image_analysis.utilities.intensity import (
 
 from pycemrg_image_analysis.utilities.artifact_simulation import downsample_volume
 
-from .sampling import extract_center_patch, extract_random_patch
+from pycemrg_image_analysis.utilities.sampling import (
+    extract_center_patch,
+    extract_random_patch,
+)
+
+from pycemrg_image_analysis.utilities.metrics import (
+    compute_mse,
+    compute_psnr,
+    compute_ssim,
+    compute_gradient_error,
+    compare_volumes,
+)
+
 
 __all__ = [
     # IO Utilities
@@ -62,7 +74,10 @@ __all__ = [
     # Sampling Utilities
     "extract_center_patch",
     "extract_random_patch",
+    # Metrics
+    "compute_mse",
+    "compute_psnr",
+    "compute_ssim",
+    "compute_gradient_error",
+    "compare_volumes",
 ]
-
-
-
