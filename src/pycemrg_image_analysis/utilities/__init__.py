@@ -42,6 +42,13 @@ from pycemrg_image_analysis.utilities.metrics import (
     compare_volumes,
 )
 
+from pycemrg_image_analysis.utilities.augmentation import (
+    augment_brightness,
+    augment_contrast,
+    augment_noise,
+    create_slice_shifted_volumes,
+)
+
 
 __all__ = [
     # IO Utilities
@@ -80,4 +87,9 @@ __all__ = [
     "compute_ssim",
     "compute_gradient_error",
     "compare_volumes",
+    # Augmentation Utilities
+    "augment_brightness",
+    "augment_contrast",
+    "augment_noise",
+    "create_slice_shifted_volumes",
 ]
