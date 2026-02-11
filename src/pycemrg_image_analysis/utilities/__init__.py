@@ -5,6 +5,8 @@ from pycemrg_image_analysis.utilities.spatial import (
     compute_target_shape,
     compute_actual_spacing,
     resample_to_isotropic,
+    get_voxel_physical_bounds,
+    extract_slice_voxels,
 )
 from pycemrg_image_analysis.utilities.geometry import calculate_cylinder_mask
 from pycemrg_image_analysis.utilities.masks import (
@@ -70,6 +72,8 @@ __all__ = [
     "compute_target_shape",
     "compute_actual_spacing",
     "resample_to_isotropic",
+    "get_voxel_physical_bounds",
+    "extract_slice_voxels",
     # Dispatchers
     "get_mask_operation_dispatcher",
     # Intensity Utilities
