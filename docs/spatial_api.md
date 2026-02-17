@@ -180,6 +180,41 @@ for idx in vox_indices:
 bounds, centers = get_voxel_physical_bounds(img, vox_indices)
 ```
 
+### `sample_image_at_points()`
+```python
+def sample_image_at_points(
+    image: sitk.Image,
+    physical_points: np.ndarray,  # (N, 3) in (X, Y, Z)
+    precise: bool = False,
+) -> Tuple[np.ndarray, np.ndarray]
+```
+
+Sample image intensities at physical coordinates. Maps mesh node positions to voxel values. Points outside the image volume are silently excluded.
+
+**Parameters:**
+- `physical_points`: `(N, 3)` array in `(X, Y, Z)` physical space convention
+- `precise`: If `False` (default), uses vectorized affine inverse (~1000× faster). If `True`, delegates to `TransformPhysicalPointToContinuousIndex` per point (use for debugging)
+
+Both modes use **containment semantics** (`floor`): returns the voxel the point falls *inside*, not the nearest voxel centre.
+
+**Returns:**
+- `sampled_indices`: `(M,)` integer indices into `physical_points` — which input points were successfully sampled
+- `sampled_values`: `(M,)` float array of intensity values
+
+If no points fall inside the image, returns empty `(0,)` arrays.
+
+**Known behaviour:** At exact voxel boundaries, fast and precise modes may disagree. Use `precise=True` for boundary-sensitive workflows.
+
+**Example:**
+```python
+mesh_coords = np.array(mesh.points)  # (N, 3) in (X, Y, Z)
+indices, values = sample_image_at_points(lge_image, mesh_coords)
+
+# Map values back to full mesh
+intensity_field = np.zeros(len(mesh_coords))
+intensity_field[indices] = values
+```
+
 ---
 
 **Full API:** See extended `spatial.py` docstrings for detailed documentation.

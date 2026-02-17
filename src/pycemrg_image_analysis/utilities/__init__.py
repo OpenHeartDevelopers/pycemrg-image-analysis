@@ -7,6 +7,7 @@ from pycemrg_image_analysis.utilities.spatial import (
     resample_to_isotropic,
     get_voxel_physical_bounds,
     extract_slice_voxels,
+    sample_image_at_points,
 )
 from pycemrg_image_analysis.utilities.geometry import calculate_cylinder_mask
 from pycemrg_image_analysis.utilities.masks import (
@@ -74,6 +75,7 @@ __all__ = [
     "resample_to_isotropic",
     "get_voxel_physical_bounds",
     "extract_slice_voxels",
+    "sample_image_at_points",
     # Dispatchers
     "get_mask_operation_dispatcher",
     # Intensity Utilities

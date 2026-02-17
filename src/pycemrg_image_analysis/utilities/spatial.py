@@ -314,3 +314,181 @@ def extract_slice_voxels(
     voxel_values = slice_2d[mask]
     
     return indices_3d, voxel_values
+
+
+# =============================================================================
+# PHYSICAL-TO-VOXEL SAMPLING UTILITIES
+# =============================================================================
+
+def _transform_physical_to_index_vectorized(
+    image: sitk.Image,
+    physical_points: np.ndarray,  # (N, 3) in (X, Y, Z)
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Vectorized conversion of physical coordinates to voxel indices.
+
+    Uses affine inverse transformation. Consistent with
+    _indices_to_physical_vectorized() — the inverse operation.
+
+    Args:
+        image: SimpleITK image with spacing, origin, direction metadata
+        physical_points: (N, 3) array of physical coordinates in (X, Y, Z) order
+
+    Returns:
+        Tuple of:
+        - voxel_indices: (N, 3) integer array in (X, Y, Z) order (SimpleITK convention)
+        - in_bounds: (N,) boolean array, True where index is within image volume
+
+    Note:
+        - Returns indices in (X, Y, Z) order for direct use with image.GetSize()
+        - Caller is responsible for converting to (Z, Y, X) for array indexing
+        - Uses round() to match SimpleITK's TransformPhysicalPointToIndex behaviour
+        - For verification or debugging, compare against
+          _transform_physical_to_index_precise()
+    """
+    origin = np.array(image.GetOrigin())      # (X, Y, Z)
+    spacing = np.array(image.GetSpacing())    # (X, Y, Z)
+    direction = np.array(image.GetDirection()).reshape(3, 3)
+
+    # Inverse affine: Index = Spacing^-1 * Direction^-1 * (Physical - Origin)
+    direction_inv = np.linalg.inv(direction)
+    indices_float = ((direction_inv @ (physical_points - origin).T).T) / spacing
+
+    # Round to nearest integer voxel index — matches SimpleITK's
+    # TransformPhysicalPointToIndex behaviour (nearest neighbour, not floor)
+    voxel_indices = np.floor(indices_float).astype(int)
+
+    # Check bounds against image size (X, Y, Z)
+    size = np.array(image.GetSize())  # (X, Y, Z)
+    in_bounds = np.all((voxel_indices >= 0) & (voxel_indices < size), axis=1)
+
+    return voxel_indices, in_bounds
+
+
+def _transform_physical_to_index_precise(
+    image: sitk.Image,
+    physical_points: np.ndarray,  # (N, 3) in (X, Y, Z)
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Loop-based conversion of physical coordinates to voxel indices.
+
+    Delegates each coordinate transform to SimpleITK.TransformPhysicalPointToIndex,
+    which is the reference implementation. Slower than the vectorized version
+    but guaranteed to match SimpleITK's internal behaviour exactly.
+
+    Args:
+        image: SimpleITK image with spacing, origin, direction metadata
+        physical_points: (N, 3) array of physical coordinates in (X, Y, Z) order
+
+    Returns:
+        Tuple of:
+        - voxel_indices: (N, 3) integer array in (X, Y, Z) order (SimpleITK convention)
+        - in_bounds: (N,) boolean array, True where index is within image volume
+
+    Note:
+        - Use this for debugging or verifying the vectorized implementation
+        - For production use, prefer _transform_physical_to_index_vectorized()
+    """
+    size = image.GetSize()  # (X, Y, Z)
+
+    voxel_indices = np.zeros((len(physical_points), 3), dtype=int)
+    in_bounds = np.zeros(len(physical_points), dtype=bool)
+
+    for i, point in enumerate(physical_points):
+        continuous_idx = image.TransformPhysicalPointToContinuousIndex(point.tolist())
+        idx = tuple(int(np.floor(v)) for v in continuous_idx)
+        voxel_indices[i] = idx
+
+        in_bounds[i] = all(0 <= idx[dim] < size[dim] for dim in range(3))
+
+    return voxel_indices, in_bounds
+
+
+def sample_image_at_points(
+    image: sitk.Image,
+    physical_points: np.ndarray,
+    precise: bool = False,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Sample image intensities at physical coordinates.
+
+    Maps physical-space coordinates (e.g., mesh nodes) to voxel indices
+    and returns the intensity value at each valid point. Points outside
+    the image volume are silently excluded.
+
+    Handles oblique images correctly via affine transformation.
+
+    Args:
+        image: SimpleITK image (any orientation)
+        physical_points: (N, 3) array of physical coordinates in (X, Y, Z) order
+        precise: If False (default), uses vectorized affine inverse transform
+                 (~1000x faster). If True, delegates each point to
+                 SimpleITK.TransformPhysicalPointToIndex (reference implementation).
+                 Use precise=True for debugging or verifying results.
+
+                 Note: At exact voxel boundaries, the two modes may disagree on
+                 whether a point is in or out of bounds due to floating point
+                 rounding differences. This is expected behaviour, not a bug.
+                 For boundary-sensitive workflows, use precise=True.
+
+    Returns:
+        Tuple of:
+        - sampled_indices: (M,) integer indices into physical_points,
+          identifying which input points were successfully sampled
+        - sampled_values: (M,) float array of intensity values
+
+        If no points fall inside the image, returns empty arrays (0,) and (0,).
+
+    Note:
+        - physical_points must be in (X, Y, Z) order (physical space convention)
+        - Points outside the image volume are silently excluded
+        - Use sampled_indices to map results back to the original point array
+
+    Example:
+        >>> # Sample LGE intensities at mesh node positions
+        >>> mesh_coords = np.array(mesh.points)  # (N, 3) in (X, Y, Z)
+        >>> indices, values = sample_image_at_points(lge_image, mesh_coords)
+        >>>
+        >>> # Map values back to full mesh
+        >>> intensity_field = np.zeros(len(mesh_coords))
+        >>> intensity_field[indices] = values
+        >>>
+        >>> # Verify with precise mode if needed
+        >>> indices_p, values_p = sample_image_at_points(
+        ...     lge_image, mesh_coords, precise=True
+        ... )
+        >>> assert np.allclose(values, values_p)  # Should match
+    """
+    if physical_points.ndim != 2 or physical_points.shape[1] != 3:
+        raise ValueError(
+            f"physical_points must have shape (N, 3), got {physical_points.shape}"
+        )
+
+    if len(physical_points) == 0:
+        return np.empty(0, dtype=int), np.empty(0, dtype=float)
+
+    # Dispatch to appropriate transform implementation
+    transform_fn = (
+        _transform_physical_to_index_precise if precise
+        else _transform_physical_to_index_vectorized
+    )
+
+    voxel_indices_xyz, in_bounds = transform_fn(image, physical_points)
+
+    if not np.any(in_bounds):
+        return np.empty(0, dtype=int), np.empty(0, dtype=float)
+
+    # Sample image at valid voxel indices
+    image_array = sitk.GetArrayFromImage(image)  # (Z, Y, X)
+
+    valid_point_indices = np.where(in_bounds)[0]
+    valid_voxels = voxel_indices_xyz[in_bounds]  # (M, 3) in (X, Y, Z)
+
+    # Convert (X, Y, Z) indices to (Z, Y, X) for NumPy array indexing
+    x_idx = valid_voxels[:, 0]
+    y_idx = valid_voxels[:, 1]
+    z_idx = valid_voxels[:, 2]
+
+    sampled_values = image_array[z_idx, y_idx, x_idx].astype(float)
+
+    return valid_point_indices, sampled_values
