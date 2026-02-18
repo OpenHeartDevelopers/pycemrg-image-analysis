@@ -88,3 +88,20 @@ class ValveRule:
 class ValveCreationContract(CreationContract):
     """Specific contract for valve creation, adding the rule."""
     rule: ValveRule
+
+@dataclass(frozen=True)
+class RingRule:
+    """Defines the recipe for creating a vein ring."""
+    source_vein_label_name: str
+    target_ring_label_name: str
+    ring_thickness_parameter_name: str
+    atrium_myocardium_name: str  # "LA_myo_label" or "RA_myo_label"
+    application_steps: list[ApplicationStep]
+
+
+@dataclass(frozen=True)
+class RingCreationContract(CreationContract):
+    """Contract for ring creation."""
+    rule: RingRule
+    reference_image: sitk.Image  # Frozen snapshot for distance map calculation
+    atrium_myocardium_threshold: Optional[sitk.Image] = None  # Pre-computed or None

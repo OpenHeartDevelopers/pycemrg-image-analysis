@@ -32,3 +32,13 @@ class ValveSemanticRole(Enum):
     TARGET_VALVE_NAME = auto()
     INTERSECTION_THICKNESS_PARAMETER_NAME = auto()
     APPLICATION_STEPS = auto()
+
+class RingSemanticRole(Enum):
+    """
+    Defines the abstract roles a label or parameter can play in ring creation.
+    """
+    SOURCE_VEIN_LABEL_NAME = auto()
+    TARGET_RING_LABEL_NAME = auto()
+    RING_THICKNESS_PARAMETER_NAME = auto()
+    ATRIUM_MYOCARDIUM_NAME = auto()
+    APPLICATION_STEPS = auto()

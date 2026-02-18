@@ -6,10 +6,12 @@ from pathlib import Path
 from typing import Tuple
 
 from pycemrg.data.labels import LabelManager
-from pycemrg_image_analysis.logic.contracts import CylinderCreationContract
-from .contracts import MyocardiumCreationContract
-
-
+from pycemrg_image_analysis.logic.contracts import (
+    CylinderCreationContract,
+    MyocardiumCreationContract,
+    ValveCreationContract,
+    RingCreationContract,
+)
 class SegmentationPathBuilder:
     """
     A convenience builder to construct path and data contracts.
@@ -110,3 +112,85 @@ class MyocardiumPathBuilder:
             parameters=self._parameters,
             output_path=output_path,
         )
+    
+    def build_valve_contract(
+        self,
+        output_name: str,
+    ) -> ValveCreationContract:
+        """
+        Build contract for valve creation.
+        
+        Args:
+            output_name: Base name for output file (e.g., "seg_mitral_valve")
+        
+        Returns:
+            ValveCreationContract ready for ValveLogic.create_from_rule()
+        
+        Example:
+            >>> builder = MyocardiumPathBuilder(...)
+            >>> mv_contract = builder.build_valve_contract("seg_mitral_valve")
+            >>> # Logic method fills in the rule
+            >>> rule = create_valve_rule_from_schematic(MITRAL_VALVE_SCHEMATIC)
+            >>> contract = dataclasses.replace(mv_contract, rule=rule)
+            >>> result = valve_logic.create_from_rule(contract)
+        """
+        output_path = self._output_dir / f"{output_name}.nrrd"
+        
+        return ValveCreationContract(
+            input_image=self._input_image,
+            rule=None,  # Logic method fills this in
+            label_manager=self._label_manager,
+            parameters=self._parameters,
+            output_path=output_path,
+        )
+    
+    def build_ring_contract(
+        self,
+        output_name: str,
+        reference_image: sitk.Image,
+        atrium_myocardium_threshold: Optional[sitk.Image] = None,
+    ) -> RingCreationContract:
+        """
+        Build contract for ring creation.
+        
+        Args:
+            output_name: Base name for output file (e.g., "seg_lpv1_ring")
+            reference_image: Frozen snapshot for distance map calculation.
+                            Should be captured before starting ring sequence.
+            atrium_myocardium_threshold: Optional pre-computed threshold.
+                                        If None, will be computed on-demand.
+        
+        Returns:
+            RingCreationContract ready for RingLogic.create_from_rule()
+        
+        Example:
+            >>> # Capture reference before ring sequence
+            >>> reference = load_image("seg_before_rings.nrrd")
+            >>> 
+            >>> # Optional: pre-compute thresholds for efficiency
+            >>> la_thresh = compute_threshold(reference, "LA_myo_label", 2.0)
+            >>> 
+            >>> # Build contracts for each ring
+            >>> lpv1_contract = builder.build_ring_contract(
+            ...     "seg_lpv1_ring",
+            ...     reference_image=reference,
+            ...     atrium_myocardium_threshold=la_thresh  # or None
+            ... )
+        """
+        output_path = self._output_dir / f"{output_name}.nrrd"
+        
+        return RingCreationContract(
+            input_image=self._input_image,
+            rule=None,  # Logic method fills this in
+            label_manager=self._label_manager,
+            parameters=self._parameters,
+            output_path=output_path,
+            reference_image=reference_image,
+            atrium_myocardium_threshold=atrium_myocardium_threshold,
+        )
+
+
+
+
+
+

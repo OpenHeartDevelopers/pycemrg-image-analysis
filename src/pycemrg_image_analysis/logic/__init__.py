@@ -9,20 +9,24 @@ from pycemrg_image_analysis.logic.builders import SegmentationPathBuilder, Myoca
 from pycemrg_image_analysis.logic.constants import (
     MyocardiumSemanticRole, 
     ValveSemanticRole,
-    ZERO_LABEL
+    RingSemanticRole,
+    ZERO_LABEL,
 )
 from pycemrg_image_analysis.logic.contracts import (
     ApplicationStep,
     CylinderCreationContract,
     MyocardiumRule,
     ValveRule,
+    RingRule,
     MyocardiumCreationContract,
     ValveCreationContract,
+    RingCreationContract,
     PushStructureContract,
 )
 from pycemrg_image_analysis.logic.segmentation import SegmentationLogic
 from pycemrg_image_analysis.logic.myocardium import MyocardiumLogic
 from pycemrg_image_analysis.logic.valves import ValveLogic
+from pycemrg_image_analysis.logic.rings import RingLogic
 
 __all__ = [
     # Application Step
@@ -34,13 +38,18 @@ __all__ = [
     "MyocardiumRule",
     "ValveRule",
     "MyocardiumSemanticRole", 
+    "ValveSemanticRole",
+    "RingSemanticRole",
+    "ZERO_LABEL",
     # Contracts
     "CylinderCreationContract",
     "MyocardiumCreationContract",
-    "PushStructureContract",
     "ValveCreationContract",
+    "RingCreationContract",
+    "PushStructureContract",
     # Logic Engines
     "SegmentationLogic",
     "MyocardiumLogic",
-    "ValveLogic",
+    "ValveLogic",#
+    "RingLogic",
 ]
