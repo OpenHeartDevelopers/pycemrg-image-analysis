@@ -11,3 +11,5 @@ dist/
 .idea/
 .vscode/
 PYCEMRG_TEST_CONFIGS
+
+.DS_Store
