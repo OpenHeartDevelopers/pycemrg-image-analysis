@@ -188,6 +188,30 @@ class MyocardiumPathBuilder:
             reference_image=reference_image,
             atrium_myocardium_threshold=atrium_myocardium_threshold,
         )
+    
+    def update_input_image(self, new_input: sitk.Image) -> None:
+        """
+        Update the input image for subsequent contract builds.
+        
+        Use this when reusing a builder across workflow steps where each
+        step's output becomes the next step's input.
+        
+        Args:
+            new_input: The new input image (typically the result from a previous step)
+            
+        Example:
+            >>> builder = MyocardiumPathBuilder(...)
+            >>> 
+            >>> # Step 1
+            >>> contract1 = builder.build_creation_contract("lv_outflow")
+            >>> result1 = logic.create_from_rule(contract1)
+            >>> 
+            >>> # Step 2 - update input
+            >>> builder.update_input_image(result1)
+            >>> contract2 = builder.build_creation_contract("rv_myocardium")
+            >>> result2 = logic.create_from_rule(contract2)
+        """
+        self._input_image = new_input
 
 
 

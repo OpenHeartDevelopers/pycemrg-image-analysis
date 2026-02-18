@@ -14,7 +14,7 @@ from pycemrg_image_analysis.utilities import (
     get_mask_operation_dispatcher,
     MaskOperationMode,
 )
-
+logger = logging.getLogger(__name__)
 
 class MyocardiumLogic:
     """
@@ -32,7 +32,7 @@ class MyocardiumLogic:
         """
         The generic engine for creating one piece of myocardium.
         """
-        logging.info("1. Get names and parameters from the map")
+        logger.info("1. Get names and parameters from the map")
         source_bp_name = semantic_map[MyocardiumSemanticRole.SOURCE_BLOOD_POOL_NAME]
         target_myo_name = semantic_map[MyocardiumSemanticRole.TARGET_MYOCARDIUM_NAME]
         wt_param_name = semantic_map[
@@ -42,12 +42,12 @@ class MyocardiumLogic:
         # Get the list of application step dictionaries
         application_steps_data = semantic_map[MyocardiumSemanticRole.APPLICATION_STEPS]
 
-        logging.info("2. Translate names to values")
+        logger.info("2. Translate names to values")
         source_bp_value = label_manager.get_value(source_bp_name)
         target_myo_value = label_manager.get_value(target_myo_name)
         wall_thickness = parameters[wt_param_name]
 
-        logging.info("3. Create the initial wall mask")
+        logger.info("3. Create the initial wall mask")
         dist_map = filters.distance_map(
             input_image, source_bp_value, use_image_spacing=True
         )
@@ -55,7 +55,7 @@ class MyocardiumLogic:
             dist_map, lower=0, upper=wall_thickness, binarise=True
         )
 
-        logging.info("4. Apply the sequence of application steps")
+        logger.info("4. Apply the sequence of application steps")
         output_array = sitk.GetArrayFromImage(input_image)
         mask_array = sitk.GetArrayFromImage(new_wall_mask)
         dispatcher = get_mask_operation_dispatcher()
@@ -90,7 +90,7 @@ class MyocardiumLogic:
                 **kwargs_for_utility,  # sends the correct kwarg based on mode
             )
 
-        logging.info("5. Convert back to a SimpleITK image")
+        logger.info("5. Convert back to a SimpleITK image")
         output_image = sitk.GetImageFromArray(output_array)
         output_image.CopyInformation(input_image)
         return output_image
