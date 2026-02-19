@@ -17,6 +17,39 @@ class MaskOperationMode(Enum):
     REPLACE_ONLY = auto()
     ADD = auto()
 
+def remove_label(array: np.ndarray, label: int) -> np.ndarray:
+    """Remove single label."""
+    return remove_labels(array, [label])
+
+def remove_labels(array: np.ndarray, labels: list[int]) -> np.ndarray:
+    """Remove multiple labels."""
+    output = np.copy(array)
+    mask = np.isin(output, labels)
+    output[mask] = ZERO_LABEL
+    return output
+
+def keep_labels(array: np.ndarray, labels_to_keep: list[int]) -> np.ndarray:
+    """
+    Keep only specified labels, remove everything else.
+    
+    Inverse of remove_labels - useful for extracting structures.
+    
+    Args:
+        array: Input segmentation array
+        labels_to_keep: List of label values to preserve
+        
+    Returns:
+        Array with only kept labels, rest set to 0
+        
+    Example:
+        >>> # Extract only chambers (1, 2, 3, 4)
+        >>> chambers_only = keep_labels(seg, [1, 2, 3, 4])
+    """
+    output = np.copy(array)
+    mask = ~np.isin(output, labels_to_keep + [ZERO_LABEL])
+    output[mask] = ZERO_LABEL
+    return output
+
 def add_masks(
     base_array: np.ndarray, 
     mask_array: np.ndarray, 

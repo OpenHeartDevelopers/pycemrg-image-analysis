@@ -16,6 +16,9 @@ from pycemrg_image_analysis.utilities.masks import (
     add_masks_replace,
     add_masks_replace_except,
     add_masks_replace_only,
+    remove_label, 
+    remove_labels,
+    keep_labels,
 )
 from pycemrg_image_analysis.utilities.filters import (
     and_filter,
@@ -52,6 +55,17 @@ from pycemrg_image_analysis.utilities.augmentation import (
     create_slice_shifted_volumes,
 )
 
+from pycemrg_image_analysis.utilities.postprocessing import (
+    remove_label,
+    remove_labels,
+    keep_labels,
+    inspect_labels,
+    remove_labels_by_name,
+    keep_labels_by_name,
+    relabel_image,
+    relabel_image_by_name,
+)
+
 
 __all__ = [
     # IO Utilities
@@ -65,6 +79,9 @@ __all__ = [
     "add_masks_replace",
     "add_masks_replace_except",
     "add_masks_replace_only",
+    "remove_label",
+    "remove_labels",
+    "keep_labels",
     # Filter Utilities
     "and_filter",
     "distance_map",
@@ -98,4 +115,13 @@ __all__ = [
     "augment_contrast",
     "augment_noise",
     "create_slice_shifted_volumes",
+    # Post-processing Utilities
+    "remove_label",
+    "remove_labels",
+    "keep_labels",
+    "inspect_labels",
+    "remove_labels_by_name",
+    "keep_labels_by_name",
+    "relabel_image",
+    "relabel_image_by_name",
 ]
