@@ -318,3 +318,61 @@ def check_labels(image_path: Path, schematic_name: str) -> DiagnosticReport:
     report = diagnostic.check_image_against_schematic(image_path, schematic_name)
     diagnostic.print_report(report)
     return report
+
+def get_present_labels(image: sitk.Image) -> set[int]:
+    """
+    Get all unique non-zero labels present in an image.
+    
+    Pure stateless function that extracts label values from image array.
+    Useful for runtime validation before executing workflow steps.
+    
+    Args:
+        image: SimpleITK image to inspect
+        
+    Returns:
+        Set of integer label values present in image (excluding 0/background)
+        
+    Example:
+        >>> present = get_present_labels(working_image)
+        >>> # {1, 2, 3, 5}
+        >>> 
+        >>> # Orchestrator checks before step
+        >>> required = {1, 4}  # Step needs LV_BP and LA_BP
+        >>> if not required.issubset(present):
+        ...     missing = required - present
+        ...     logger.warning(f"Missing labels {missing}, skipping step")
+        ...     continue
+    """
+    array = sitk.GetArrayFromImage(image)
+    unique_labels = np.unique(array).astype(int)
+    
+    # Remove background (0)
+    non_zero = set(unique_labels) - {0}
+    
+    return non_zero
+
+def check_required_labels(
+    image: sitk.Image,
+    required_label_values: set[int]
+) -> tuple[bool, set[int]]:
+    """
+    Check if image contains all required labels.
+    
+    Args:
+        image: SimpleITK image to check
+        required_label_values: Set of integer labels that must be present
+        
+    Returns:
+        Tuple of (all_present: bool, missing: set[int])
+        
+    Example:
+        >>> required = {1, 4, 201}
+        >>> all_present, missing = check_required_labels(working_image, required)
+        >>> if not all_present:
+        ...     logger.warning(f"Missing: {missing}")
+    """
+    present = get_present_labels(image)
+    missing = required_label_values - present
+    all_present = len(missing) == 0
+    
+    return all_present, missing

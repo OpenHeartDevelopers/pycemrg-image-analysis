@@ -276,6 +276,84 @@ Rings:
 
 ---
 
+## Runtime Validation Functions
+
+### `get_present_labels(image) -> set[int]`
+
+Get all unique non-zero labels present in an image.
+
+Pure stateless function that extracts label values from in-memory image.
+Useful for runtime validation before executing workflow steps.
+
+**Parameters:**
+- `image`: SimpleITK.Image to inspect
+
+**Returns:** Set of integer label values present (excluding 0/background)
+
+**Example:**
+```python
+from pycemrg_image_analysis.utilities.label_tools import get_present_labels
+
+# Check what's in working image
+present = get_present_labels(working_image)
+# {1, 2, 3, 5}
+
+# Orchestrator validates before step
+required = {1, 4}  # Step needs LV_BP and LA_BP
+if not required.issubset(present):
+    missing = required - present
+    logger.warning(f"Missing labels {missing}, skipping step")
+    continue
+```
+
+---
+
+### `check_required_labels(image, required_label_values) -> tuple[bool, set[int]]`
+
+Check if image contains all required labels.
+
+**Parameters:**
+- `image`: SimpleITK.Image to check
+- `required_label_values`: Set of integer labels that must be present
+
+**Returns:** Tuple of `(all_present: bool, missing: set[int])`
+
+**Example:**
+```python
+from pycemrg_image_analysis.utilities.label_tools import check_required_labels
+
+# Get required label values from LabelManager
+required = {
+    label_manager.get_value("LV_BP_label"),
+    label_manager.get_value("LA_BP_label")
+}
+
+# Check presence
+all_present, missing = check_required_labels(working_image, required)
+
+if not all_present:
+    missing_names = [label_manager.get_name(val) for val in missing]
+    logger.warning(f"Skipping mitral_valve: missing {missing_names}")
+    continue  # Skip to next step
+    
+# Safe to proceed
+contract = build_valve_contract(...)
+result = valve_logic.create_from_rule(contract)
+```
+
+**Use case:**
+These functions enable graceful degradation in orchestrators - skip workflow steps
+when required source labels are missing, rather than silently failing or producing
+garbage outputs.
+
+**Key differences from `LabelDiagnostic`:**
+- Operates on in-memory `sitk.Image`, not file paths
+- Returns machine-readable data (`set[int]`, not printed reports)
+- No schematic dependency - works with any label set
+- Designed for runtime validation, not pre-flight diagnostics
+
+---
+
 ## Workflows
 
 ### Workflow 1: Quick Check Before Using Standard Scaffolding

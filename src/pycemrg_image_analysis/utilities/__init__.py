@@ -66,6 +66,14 @@ from pycemrg_image_analysis.utilities.postprocessing import (
     relabel_image_by_name,
 )
 
+from pycemrg_image_analysis.utilities.label_tools import (
+    LabelDiagnostic,
+    LabelRemapper,
+    list_available_schematics,
+    get_present_labels,
+    check_required_labels,
+)
+
 
 __all__ = [
     # IO Utilities
@@ -124,4 +132,10 @@ __all__ = [
     "keep_labels_by_name",
     "relabel_image",
     "relabel_image_by_name",
+    # Label Tools
+    "LabelDiagnostic",  
+    "LabelRemapper",
+    "list_available_schematics",
+    "get_present_labels",
+    "check_required_labels",
 ]
