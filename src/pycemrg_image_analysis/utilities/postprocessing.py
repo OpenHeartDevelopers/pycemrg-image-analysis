@@ -13,7 +13,7 @@ Common use cases:
 """
 
 import logging
-from typing import Union, List
+from typing import List, Optional
 
 import numpy as np
 import SimpleITK as sitk
@@ -23,6 +23,11 @@ from pycemrg_image_analysis.utilities.masks import (
     remove_label as _remove_label_array,
     remove_labels as _remove_labels_array,
     keep_labels as _keep_labels_array,
+)
+
+from pycemrg_image_analysis.utilities.components import (
+    keep_largest_component,
+    keep_largest_structure,
 )
 
 logger = logging.getLogger(__name__)
@@ -393,3 +398,141 @@ def relabel_image_by_name(
     
     logger.info(f"Translating {len(label_mapping)} label names to integers")
     return relabel_image(image, integer_mapping)
+
+def keep_largest_component_by_name(
+    image: sitk.Image,
+    label_names: List[str],
+    label_manager: LabelManager
+) -> sitk.Image:
+    """
+    Keep only the largest connected component for specified labels (name-based).
+    
+    Convenience wrapper that translates semantic label names to integers,
+    then delegates to components.keep_largest_component(). Processes each
+    label independently.
+    
+    Args:
+        image: Input segmentation image
+        label_names: List of label names to process (e.g., ["Ao_BP_label", "LA_BP_label"])
+        label_manager: LabelManager for name → value lookup
+        
+    Returns:
+        New image with only largest components preserved per label
+        
+    Raises:
+        KeyError: If a label name is not found in label_manager
+        
+    Example:
+        >>> # Clean up aorta and left atrium independently
+        >>> cleaned = keep_largest_component_by_name(
+        ...     seg_image,
+        ...     ["Ao_BP_label", "LA_BP_label"],
+        ...     label_manager
+        ... )
+        
+    See also:
+        keep_largest_structure_by_name() - For treating labels as one structure
+    """
+    
+    # Look up integer values from names
+    label_values = []
+    for name in label_names:
+        try:
+            value = label_manager.get_value(name)
+            label_values.append(value)
+        except KeyError:
+            logger.warning(f"Label name '{name}' not found in LabelManager, skipping")
+            continue
+    
+    if not label_values:
+        logger.warning("No valid label names provided, returning image unchanged")
+        return image
+    
+    logger.info(
+        f"Cleaning largest components (per-label): {label_names} → {label_values}"
+    )
+    
+    # Delegate to components.py (integer-based, spatial operation)
+    return keep_largest_component(image, label_values)
+
+
+def keep_largest_structure_by_name(
+    image: sitk.Image,
+    label_names: Optional[List[str]] = None,
+    label_manager: Optional[LabelManager] = None
+) -> sitk.Image:
+    """
+    Keep only the largest connected structure across multiple labels (name-based).
+    
+    Convenience wrapper that translates semantic label names to integers,
+    then delegates to components.keep_largest_structure(). Treats all specified
+    labels as forming ONE anatomical structure.
+    
+    Args:
+        image: Input segmentation image
+        label_names: List of label names forming the structure. If None,
+                    uses all non-zero labels in image.
+        label_manager: LabelManager for name → value lookup. Required if
+                      label_names is provided.
+        
+    Returns:
+        New image with only largest structure, preserving all internal labels
+        
+    Raises:
+        ValueError: If label_names provided but label_manager is None
+        KeyError: If a label name is not found in label_manager
+        
+    Example:
+        >>> # Clean entire CardioForm output (all labels)
+        >>> cleaned = keep_largest_structure_by_name(cardioform_seg)
+        >>> # Keeps main anatomy, removes floating chunks
+        
+        >>> # Clean specific multi-label structure
+        >>> cleaned = keep_largest_structure_by_name(
+        ...     seg_image,
+        ...     ["LA_BP_label", "LPV1_label", "RPV1_label", "LPV2_label", "RPV2_label"],
+        ...     label_manager
+        ... )
+        >>> # Treats LA + all PVs as one structure
+        
+    Use case:
+        CardioForm neural network sometimes produces spatially disconnected
+        anatomy (floating aorta segments, detached atrial appendages). This
+        causes downstream valve creation to fail geometrically. Cleaning
+        before refinement prevents silent failures.
+        
+    See also:
+        keep_largest_component_by_name() - For independent per-label processing
+    """
+
+    # Handle default case (all labels)
+    if label_names is None:
+        logger.info("No labels specified, cleaning entire segmentation (all labels)")
+        return keep_largest_structure(image, label_values=None)
+    
+    # Explicit label list requires label_manager
+    if label_manager is None:
+        raise ValueError(
+            "label_manager is required when label_names is specified"
+        )
+    
+    # Look up integer values from names
+    label_values = []
+    for name in label_names:
+        try:
+            value = label_manager.get_value(name)
+            label_values.append(value)
+        except KeyError:
+            logger.warning(f"Label name '{name}' not found in LabelManager, skipping")
+            continue
+    
+    if not label_values:
+        logger.warning("No valid label names provided, returning image unchanged")
+        return image
+    
+    logger.info(
+        f"Cleaning largest structure (multi-label): {label_names} → {label_values}"
+    )
+    
+    # Delegate to components.py (integer-based, spatial operation)
+    return keep_largest_structure(image, label_values)

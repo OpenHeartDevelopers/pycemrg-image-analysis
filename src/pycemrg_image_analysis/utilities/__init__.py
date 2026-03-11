@@ -74,6 +74,11 @@ from pycemrg_image_analysis.utilities.label_tools import (
     check_required_labels,
 )
 
+from pycemrg_image_analysis.utilities.components import (
+    keep_largest_component,
+    keep_largest_structure,
+)
+
 
 __all__ = [
     # IO Utilities
@@ -90,6 +95,9 @@ __all__ = [
     "remove_label",
     "remove_labels",
     "keep_labels",
+    # Components 
+    "keep_largest_component",
+    "keep_largest_structure",
     # Filter Utilities
     "and_filter",
     "distance_map",

@@ -17,7 +17,6 @@ import numpy as np
 import SimpleITK as sitk
 
 from pycemrg.core.logs import setup_logging
-from pycemrg_image_analysis.schematics import ALL_SCHEMATICS
 from pycemrg_image_analysis.utilities import load_image
 
 setup_logging()
@@ -95,6 +94,10 @@ class LabelDiagnostic:
             >>> if report.has_issues:
             ...     print(f"Found {len(report.missing_labels)} missing labels")
         """
+
+        # Import here to avoid circular dependency when module is imported
+        from pycemrg_image_analysis.schematics import ALL_SCHEMATICS  
+        
         if schematic_name not in ALL_SCHEMATICS:
             available = ", ".join(list(ALL_SCHEMATICS.keys())[:5])
             raise KeyError(
@@ -277,6 +280,9 @@ class LabelRemapper:
 
 def list_available_schematics() -> None:
     """Print all available schematic names."""
+    # Import here to avoid circular dependency when module is imported
+    from pycemrg_image_analysis.schematics import ALL_SCHEMATICS  
+
     print("\nAvailable Schematics:")
     print("=" * 50)
     
