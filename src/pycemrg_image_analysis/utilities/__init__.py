@@ -64,6 +64,8 @@ from pycemrg_image_analysis.utilities.postprocessing import (
     keep_labels_by_name,
     relabel_image,
     relabel_image_by_name,
+    LabelVolumes,
+    compute_label_volumes,
 )
 
 from pycemrg_image_analysis.utilities.label_tools import (
@@ -140,6 +142,8 @@ __all__ = [
     "keep_labels_by_name",
     "relabel_image",
     "relabel_image_by_name",
+    "LabelVolumes",
+    "compute_label_volumes",
     # Label Tools
     "LabelDiagnostic",  
     "LabelRemapper",

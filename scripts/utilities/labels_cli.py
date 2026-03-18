@@ -9,17 +9,23 @@ Usage:
     python scripts/utilities/labels.py check --input IMAGE --schematic NAME
     python scripts/utilities/labels.py list-schematics
     python scripts/utilities/labels.py suggest --input IMAGE --schematic NAME
+    python scripts/utilities/labels.py volumes --input IMAGE --labels 1 2 3
+    python scripts/utilities/labels.py volumes --input IMAGE --labels-file labels.yaml
 """
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
 import numpy as np
 import SimpleITK as sitk
+import yaml
 
 # Add project root to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+from pycemrg.data import LabelManager
 
 from pycemrg_image_analysis.utilities.label_tools import (
     LabelDiagnostic,
@@ -27,6 +33,7 @@ from pycemrg_image_analysis.utilities.label_tools import (
     list_available_schematics,
 )
 from pycemrg_image_analysis.utilities import load_image
+from pycemrg_image_analysis.utilities.postprocessing import compute_label_volumes
 
 
 def cmd_show(args):
@@ -197,6 +204,82 @@ def cmd_suggest(args):
         sys.exit(1)
 
 
+def cmd_volumes(args):
+    """Compute physical volumes for a set of labels."""
+    try:
+        img = load_image(args.input)
+    except FileNotFoundError:
+        print(f"Error: File not found: {args.input}")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error loading image: {e}")
+        sys.exit(1)
+
+    # Resolve label values and build name lookup
+    name_lookup: dict[int, str] = {}
+
+    if args.labels_file:
+        try:
+            with open(args.labels_file) as f:
+                config = yaml.safe_load(f)
+        except FileNotFoundError:
+            print(f"Error: Labels file not found: {args.labels_file}")
+            sys.exit(1)
+
+        raw = config.get("labels", {})
+        if not raw:
+            print(f"Error: No 'labels' key found in {args.labels_file}")
+            sys.exit(1)
+
+        label_values = [int(v) for v in raw.values()]
+        label_manager = LabelManager(config_path=Path(args.labels_file))
+        for value in label_values:
+            try:
+                name_lookup[value] = label_manager.get_name(value)
+            except KeyError:
+                name_lookup[value] = f"label_{value}"
+    else:
+        label_values = args.labels
+
+    try:
+        volumes = compute_label_volumes(img, label_values, use_mm3=args.mm3)
+    except ValueError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+
+    if args.plain:
+        for value, vol in volumes.by_label.items():
+            name = name_lookup.get(value, f"label_{value}")
+            print(f"{value},{name},{vol:.4f},{volumes.unit}")
+        print(f"total,total,{volumes.total:.4f},{volumes.unit}")
+        return
+
+    result = {
+        "input": str(args.input),
+        "unit": volumes.unit,
+        "labels": [
+            {
+                "value": value,
+                "name": name_lookup.get(value, f"label_{value}"),
+                "volume": vol,
+            }
+            for value, vol in volumes.by_label.items()
+        ],
+        "total": volumes.total,
+    }
+    json_str = json.dumps(result, indent=2)
+
+    if args.output:
+        try:
+            with open(args.output, "w") as f:
+                f.write(json_str)
+        except OSError as e:
+            print(f"Error writing output: {e}")
+            sys.exit(1)
+    else:
+        print(json_str)
+
+
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
@@ -218,6 +301,18 @@ Examples:
   
   # Auto-suggest and save to file
   python scripts/utilities/labels.py suggest --input seg.nrrd --schematic lpv1_ring --output mapping.json
+
+  # Compute volumes by integer label (default mL)
+  python scripts/utilities/labels.py volumes --input seg.nrrd --labels 1 2 3
+
+  # Compute volumes from labels.yaml, report in mm3
+  python scripts/utilities/labels.py volumes --input seg.nrrd --labels-file labels.yaml --mm3
+
+  # Plain output for CSV accumulation
+  python scripts/utilities/labels.py volumes --input seg.nrrd --labels 1 2 3 --plain >> results.csv
+
+  # Write JSON to file
+  python scripts/utilities/labels.py volumes --input seg.nrrd --labels-file labels.yaml --output volumes.json
         """
     )
     
@@ -287,7 +382,50 @@ Examples:
         help='Save mapping to JSON file (optional)'
     )
     suggest_parser.set_defaults(func=cmd_suggest)
-    
+
+    # --- VOLUMES command ---
+    volumes_parser = subparsers.add_parser(
+        'volumes',
+        help='Compute physical volume of one or more labels'
+    )
+    volumes_parser.add_argument(
+        '--input',
+        type=Path,
+        required=True,
+        help='Path to image file (.nrrd, .nii, .nii.gz)'
+    )
+    label_source = volumes_parser.add_mutually_exclusive_group(required=True)
+    label_source.add_argument(
+        '--labels',
+        type=int,
+        nargs='+',
+        metavar='LABEL',
+        help='Integer label values to measure (e.g. --labels 1 2 3)'
+    )
+    label_source.add_argument(
+        '--labels-file',
+        type=Path,
+        metavar='FILE',
+        help='Path to labels.yaml (LabelManager format); measures all labels in file'
+    )
+    volumes_parser.add_argument(
+        '--mm3',
+        action='store_true',
+        help='Report volumes in mm³ instead of mL'
+    )
+    volumes_parser.add_argument(
+        '--plain',
+        action='store_true',
+        help='Plain CSV-style output (value,name,volume,unit) instead of JSON'
+    )
+    volumes_parser.add_argument(
+        '--output',
+        type=Path,
+        required=False,
+        help='Write JSON output to file (cannot be combined with --plain)'
+    )
+    volumes_parser.set_defaults(func=cmd_volumes)
+
     # Parse and execute
     args = parser.parse_args()
     args.func(args)

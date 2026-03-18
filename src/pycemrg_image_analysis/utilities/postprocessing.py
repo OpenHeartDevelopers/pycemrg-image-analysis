@@ -12,6 +12,7 @@ Common use cases:
 - Clean up temporary scaffolding labels
 """
 
+from dataclasses import dataclass
 import logging
 from typing import List, Optional
 
@@ -536,3 +537,77 @@ def keep_largest_structure_by_name(
     
     # Delegate to components.py (integer-based, spatial operation)
     return keep_largest_structure(image, label_values)
+
+@dataclass
+class LabelVolumes:
+    """
+    Result of a label volume computation.
+ 
+    Attributes:
+        by_label: Volume per label value, keyed by integer label.
+        total: Sum of all individual label volumes.
+        unit: Unit of measurement, either "mL" or "mm3".
+    """
+    by_label: dict[int, float]
+    total: float
+    unit: str
+ 
+ 
+def compute_label_volumes(
+    image: sitk.Image,
+    label_values: List[int],
+    use_mm3: bool = False,
+) -> LabelVolumes:
+    """
+    Compute the physical volume of one or more labels in a segmentation image.
+ 
+    Voxel volume is derived from the image spacing (sx * sy * sz mm³). By
+    default results are reported in mL (1 mL = 1 cm³ = 1000 mm³), which is
+    the standard clinical unit. Pass use_mm3=True for raw mm³.
+ 
+    Args:
+        image: Input segmentation image. Spacing must be set correctly.
+        label_values: List of integer label values to measure.
+        use_mm3: If True, report volumes in mm³ instead of mL.
+ 
+    Returns:
+        LabelVolumes dataclass with per-label volumes and their total.
+ 
+    Raises:
+        ValueError: If label_values is empty.
+ 
+    Example:
+        >>> volumes = compute_label_volumes(seg_image, [1, 2, 3])
+        >>> print(f"LV blood pool: {volumes.by_label[1]:.2f} mL")
+        >>> print(f"Total: {volumes.total:.2f} mL")
+ 
+        >>> # With LabelManager for readable logging
+        >>> for value, vol in volumes.by_label.items():
+        ...     name = label_manager.get_name(value)
+        ...     print(f"  {name}: {vol:.2f} {volumes.unit}")
+    """
+    if not label_values:
+        raise ValueError("label_values must not be empty.")
+ 
+    spacing = image.GetSpacing()  # (sx, sy, sz) in mm
+    voxel_volume_mm3 = spacing[0] * spacing[1] * spacing[2]
+    conversion = 1.0 if use_mm3 else 1.0 / 1000.0
+    unit = "mm3" if use_mm3 else "mL"
+ 
+    array = sitk.GetArrayFromImage(image)
+ 
+    by_label: dict[int, float] = {}
+    for label in label_values:
+        voxel_count = int(np.sum(array == label))
+        by_label[label] = voxel_count * voxel_volume_mm3 * conversion
+        logger.debug(
+            f"Label {label}: {voxel_count} voxels → {by_label[label]:.4f} {unit}"
+        )
+ 
+    total = sum(by_label.values())
+    logger.info(
+        f"Computed volumes for {len(label_values)} labels: "
+        f"total={total:.4f} {unit}"
+    )
+ 
+    return LabelVolumes(by_label=by_label, total=total, unit=unit)
