@@ -66,6 +66,65 @@ def array_to_image(
     return image
 
 
+_INR_DTYPE_MAP = {
+    ("unsigned fixed", 8):  np.uint8,
+    ("unsigned fixed", 16): np.uint16,
+    ("unsigned fixed", 32): np.uint32,
+    ("signed fixed",   8):  np.int8,
+    ("signed fixed",   16): np.int16,
+    ("signed fixed",   32): np.int32,
+    ("float",          32): np.float32,
+    ("float",          64): np.float64,
+}
+
+
+def convert_inr_to_image(inr_path: Path) -> sitk.Image:
+    """
+    Reads an INR file and returns a SimpleITK Image.
+
+    INR stores voxels in Fortran (x-fastest) order, so the raw buffer is
+    reshaped as (xdim, ydim, zdim) and passed to array_to_image with
+    numpy_is_xyz=True, which transposes to the (z, y, x) layout that
+    sitk.GetImageFromArray expects.
+
+    INR headers carry no origin; origin is fixed at (0, 0, 0).
+    """
+    if not inr_path.exists():
+        raise FileNotFoundError(f"INR file not found at: {inr_path}")
+
+    with open(inr_path, "rb") as fh:
+        raw_header = ""
+        while True:
+            line = fh.readline().decode("utf-8")
+            raw_header += line
+            if line.strip() == "##}":
+                break
+
+        fields = {}
+        for line in raw_header.split("\n"):
+            if "=" in line:
+                key, _, value = line.partition("=")
+                fields[key.strip()] = value.strip()
+
+        xdim = int(fields["XDIM"])
+        ydim = int(fields["YDIM"])
+        zdim = int(fields["ZDIM"])
+        spacing = (float(fields["VX"]), float(fields["VY"]), float(fields["VZ"]))
+        pixsize = int(fields["PIXSIZE"].split()[0])
+        dtype_key = fields["TYPE"]
+
+        np_dtype = _INR_DTYPE_MAP.get((dtype_key, pixsize))
+        if np_dtype is None:
+            raise ValueError(
+                f"Unsupported INR dtype: TYPE={dtype_key!r}, PIXSIZE={pixsize}"
+            )
+
+        data = np.frombuffer(fh.read(), dtype=np_dtype)
+        data = data.reshape((xdim, ydim, zdim), order="F")
+
+    return array_to_image(data, origin=(0.0, 0.0, 0.0), spacing=spacing, numpy_is_xyz=True)
+
+
 def save_image_from_array(
     array: np.ndarray,
     origin: Tuple[float, float, float],

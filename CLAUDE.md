@@ -50,6 +50,9 @@ library.
 - LV/RV = Left/Right Ventricle; LA/RA = Left/Right Atrium
 - LPV/RPV = Left/Right Pulmonary Vein; SVC/IVC = Superior/Inferior Vena Cava
 
+- **LabelDiagnostic:** Compares an image's present labels against a named schematic, producing a `DiagnosticReport` (missing/unexpected labels).
+- **LabelRemapper:** Builds an integer→integer mapping to reconcile label values; use `suggest_mapping_from_report()` to derive it automatically from a `DiagnosticReport`.
+
 ## Non-Obvious Constraints
 
 **Image spacing must be correct.** `MyocardiumLogic` and `ValveLogic` use physical-space

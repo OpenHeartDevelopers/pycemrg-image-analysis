@@ -1,6 +1,6 @@
 # src/pycemrg_image_analysis/utilities/__init__.py
 
-from pycemrg_image_analysis.utilities.io import load_image, save_image
+from pycemrg_image_analysis.utilities.io import load_image, save_image, convert_inr_to_image
 from pycemrg_image_analysis.utilities.spatial import (
     compute_target_shape,
     compute_actual_spacing,
@@ -86,6 +86,7 @@ __all__ = [
     # IO Utilities
     "load_image",
     "save_image",
+    "convert_inr_to_image",
     # Geometry Utilities
     "calculate_cylinder_mask",
     # Mask Utilities
