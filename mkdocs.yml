@@ -1,0 +1,53 @@
+site_name: pycemrg-image-analysis
+site_description: Cardiac image segmentation post-processing library — CEMRG, Imperial College London
+site_url: https://openheartdevelopers.github.io/pycemrg-image-analysis/
+repo_url: https://github.com/OpenHeartDevelopers/pycemrg-image-analysis
+repo_name: OpenHeartDevelopers/pycemrg-image-analysis
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: red
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: red
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - API Reference:
+    - Overview & Patterns: api/overview.md
+    - Recipes: api/recipes.md
+    - Components: api/components.md
+    - Label Tools: api/label_tools.md
+    - Spatial: api/spatial.md
+    - Augmentation: api/augmentation.md
+    - Metrics: api/metrics.md
+  - CLI:
+    - Labels: cli/labels.md
+  - Developer Guides:
+    - Add a Myocardium Component: guides/add_myocardium_component.md
