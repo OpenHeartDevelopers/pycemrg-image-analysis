@@ -13,3 +13,7 @@ dist/
 PYCEMRG_TEST_CONFIGS
 
 .DS_Store
+
+CLAUDE.md
+./claude 
+./claude/** 
