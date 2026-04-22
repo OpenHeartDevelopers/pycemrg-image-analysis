@@ -1,0 +1,1776 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Cardiac image segmentation post-processing library — CEMRG, Imperial College London">
+      
+      
+      
+        <link rel="canonical" href="https://openheartdevelopers.github.io/pycemrg-image-analysis/cli/labels/">
+      
+      
+        <link rel="prev" href="../../api/metrics/">
+      
+      
+        <link rel="next" href="../../guides/add_myocardium_component/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Labels - pycemrg-image-analysis</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#labels-cli-tool" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="pycemrg-image-analysis" class="md-header__button md-logo" aria-label="pycemrg-image-analysis" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            pycemrg-image-analysis
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Labels
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="deep-orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/OpenHeartDevelopers/pycemrg-image-analysis" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    OpenHeartDevelopers/pycemrg-image-analysis
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../api/overview/" class="md-tabs__link">
+          
+  
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  CLI
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guides/add_myocardium_component/" class="md-tabs__link">
+          
+  
+  
+  Developer Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="pycemrg-image-analysis" class="md-nav__button md-logo" aria-label="pycemrg-image-analysis" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    pycemrg-image-analysis
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/OpenHeartDevelopers/pycemrg-image-analysis" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    OpenHeartDevelopers/pycemrg-image-analysis
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview & Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/recipes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recipes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/components/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Components
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/label_tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Label Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/spatial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spatial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/augmentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Augmentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    CLI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Labels
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Labels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-show-display-labels-in-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. show - Display Labels in Image
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-check-validate-against-schematic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. check - Validate Against Schematic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-list-schematics-show-available-schematics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. list-schematics - Show Available Schematics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-suggest-auto-generate-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. suggest - Auto-Generate Mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typical-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Typical Workflows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Typical Workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-1-quick-label-inspection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 1: Quick Label Inspection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-2-pre-flight-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 2: Pre-Flight Check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-3-slicer-reset-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 3: Slicer Reset Recovery
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-4-batch-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 4: Batch Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tips
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tip-1-piping-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tip 1: Piping Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tip-2-scripting-with-exit-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tip 2: Scripting with Exit Codes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tip-3-quick-schematic-lookup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tip 3: Quick Schematic Lookup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Messages
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Messages">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file-not-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "File not found"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-schematic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Invalid schematic"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cannot-auto-detect-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Cannot auto-detect mapping"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integration-with-python-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration with Python API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/add_myocardium_component/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add a Myocardium Component
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Commands
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-show-display-labels-in-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. show - Display Labels in Image
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-check-validate-against-schematic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. check - Validate Against Schematic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-list-schematics-show-available-schematics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. list-schematics - Show Available Schematics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-suggest-auto-generate-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. suggest - Auto-Generate Mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typical-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Typical Workflows
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Typical Workflows">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#workflow-1-quick-label-inspection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 1: Quick Label Inspection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-2-pre-flight-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 2: Pre-Flight Check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-3-slicer-reset-recovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 3: Slicer Reset Recovery
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#workflow-4-batch-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Workflow 4: Batch Validation
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tips
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tip-1-piping-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tip 1: Piping Output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tip-2-scripting-with-exit-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tip 2: Scripting with Exit Codes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tip-3-quick-schematic-lookup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tip 3: Quick Schematic Lookup
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Messages
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Error Messages">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#file-not-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "File not found"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#invalid-schematic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Invalid schematic"
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cannot-auto-detect-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        "Cannot auto-detect mapping"
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integration-with-python-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integration with Python API
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="labels-cli-tool">Labels CLI Tool<a class="headerlink" href="#labels-cli-tool" title="Permanent link">&para;</a></h1>
+<p>Command-line utility for label diagnostics and remapping.</p>
+<hr />
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
+<p>No installation needed - runs directly from the repository:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>COMMAND<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
+<hr />
+<h2 id="commands">Commands<a class="headerlink" href="#commands" title="Permanent link">&para;</a></h2>
+<h3 id="1-show-display-labels-in-image">1. <code>show</code> - Display Labels in Image<a class="headerlink" href="#1-show-display-labels-in-image" title="Permanent link">&para;</a></h3>
+<p>Show all unique labels with voxel counts and percentages.</p>
+<p><strong>Usage:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>show<span class="w"> </span>--input<span class="w"> </span>IMAGE
+</code></pre></div></p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>show<span class="w"> </span>--input<span class="w"> </span>seg_from_slicer.nrrd
+</code></pre></div></p>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Analyzing: seg_from_slicer.nrrd
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>======================================================================
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>Image shape (Z, Y, X): (192, 512, 512)
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>Spacing (X, Y, Z): (0.28125, 0.28125, 0.5)
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>Origin (X, Y, Z): (0.0, 0.0, 0.0)
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>Found 4 unique labels:
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>Label      Voxel Count     Percentage
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>----------------------------------------
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>0          48234567           95.23%
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>1          1234567             2.44%  ●
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>2          987654              1.95%  ●
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>5          193456              0.38%  ●
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>✓ Non-zero labels: [1, 2, 5]
+</code></pre></div></p>
+<p><strong>Use this to:</strong>
+- Check which labels exist in your segmentation
+- See label distribution
+- Verify Slicer didn't reset your labels</p>
+<hr />
+<h3 id="2-check-validate-against-schematic">2. <code>check</code> - Validate Against Schematic<a class="headerlink" href="#2-check-validate-against-schematic" title="Permanent link">&para;</a></h3>
+<p>Compare image labels to schematic expectations.</p>
+<p><strong>Usage:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>check<span class="w"> </span>--input<span class="w"> </span>IMAGE<span class="w"> </span>--schematic<span class="w"> </span>NAME
+</code></pre></div></p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>check<span class="w"> </span>--input<span class="w"> </span>seg.nrrd<span class="w"> </span>--schematic<span class="w"> </span>lpv1_ring
+</code></pre></div></p>
+<p><strong>Output (when labels match):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Checking: seg.nrrd
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>Against schematic: lpv1_ring
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>======================================================================
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>Label Diagnostic Report
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>======================================================================
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>...
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>✅ ALL LABELS MATCH
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>  • LPV1_label: 8 ✓
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>  • LA_myo_label: 104 ✓
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>  • LPV1_ring_label: 208 ✓
+</code></pre></div></p>
+<p><strong>Output (when labels don't match):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>❌ ISSUES FOUND:
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>Missing labels (2):
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>  • LPV1_label: expected 8, NOT FOUND in image
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>  • LA_myo_label: expected 104, NOT FOUND in image
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>💡 SUGGESTION:
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>   Your image has different label values than the schematic expects.
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>   Use LabelRemapper to create a custom mapping...
+</code></pre></div></p>
+<p><strong>Exit codes:</strong>
+- <code>0</code> - All labels match
+- <code>1</code> - Issues found</p>
+<p><strong>Use this to:</strong>
+- Verify compatibility before running workflows
+- Identify which labels need remapping
+- Automate validation in CI/CD pipelines</p>
+<hr />
+<h3 id="3-list-schematics-show-available-schematics">3. <code>list-schematics</code> - Show Available Schematics<a class="headerlink" href="#3-list-schematics-show-available-schematics" title="Permanent link">&para;</a></h3>
+<p>List all schematics organized by category.</p>
+<p><strong>Usage:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>list-schematics
+</code></pre></div></p>
+<p><strong>Output:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Available Schematics:
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>==================================================
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>Myocardium:
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>  • aortic_wall
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>  • la_myocardium
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>  • lv_outflow
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>  • pulmonary_artery
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>  • ra_myocardium
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>  • rv_myocardium
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>Valves:
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>  • aortic_valve
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>  • mitral_valve
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>  • pulmonary_valve
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>  • tricuspid_valve
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>Rings:
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>  • ivc_ring
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>  • laa_ring
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>  • lpv1_ring
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>  • lpv2_ring
+<a id="__codelineno-9-23" name="__codelineno-9-23" href="#__codelineno-9-23"></a>  • rpv1_ring
+<a id="__codelineno-9-24" name="__codelineno-9-24" href="#__codelineno-9-24"></a>  • rpv2_ring
+<a id="__codelineno-9-25" name="__codelineno-9-25" href="#__codelineno-9-25"></a>  • svc_ring
+</code></pre></div></p>
+<p><strong>Use this to:</strong>
+- Find the correct schematic name
+- See what's available in the library</p>
+<hr />
+<h3 id="4-suggest-auto-generate-mapping">4. <code>suggest</code> - Auto-Generate Mapping<a class="headerlink" href="#4-suggest-auto-generate-mapping" title="Permanent link">&para;</a></h3>
+<p>Attempt to auto-detect label mapping (for sequential labels after Slicer reset).</p>
+<p><strong>Usage:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>suggest<span class="w"> </span>--input<span class="w"> </span>IMAGE<span class="w"> </span>--schematic<span class="w"> </span>NAME<span class="w"> </span><span class="o">[</span>--output<span class="w"> </span>FILE<span class="o">]</span>
+</code></pre></div></p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>suggest<span class="w"> </span>--input<span class="w"> </span>seg_from_slicer.nrrd<span class="w"> </span>--schematic<span class="w"> </span>lpv1_ring
+</code></pre></div></p>
+<p><strong>Output (when auto-detection succeeds):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>Analyzing: seg_from_slicer.nrrd
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>For schematic: lpv1_ring
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>======================================================================
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>✅ Auto-detected sequential mapping:
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>Copy this mapping into your code:
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>----------------------------------------------------------------------
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>mapping = {
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>    &quot;LPV1_label&quot;: 1,
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>    &quot;LA_myo_label&quot;: 2,
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>    &quot;LPV1_ring_label&quot;: 3,
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a>}
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>----------------------------------------------------------------------
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a>
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a>Or save to file:
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a>  Use --output FILENAME.json to save mapping
+</code></pre></div></p>
+<p><strong>With <code>--output</code> flag:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>suggest<span class="w"> </span>--input<span class="w"> </span>seg.nrrd<span class="w"> </span>--schematic<span class="w"> </span>lpv1_ring<span class="w"> </span>--output<span class="w"> </span>my_mapping.json
+</code></pre></div>
+Creates <code>my_mapping.json</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="p">{</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">&quot;LPV1_label&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="nt">&quot;LA_myo_label&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span><span class="nt">&quot;LPV1_ring_label&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="p">}</span>
+</code></pre></div></p>
+<p><strong>Output (when auto-detection fails):</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>⚠️  Cannot auto-detect mapping
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>Reasons:
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>  - Labels are not sequential (1, 2, 3...)
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>  - Label count doesn&#39;t match schematic expectations
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>Your image has these labels:
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>  [5, 10, 15]
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>Schematic expects these labels:
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>  LPV1_label: 8
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>  LA_myo_label: 104
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>  LPV1_ring_label: 208
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a>You&#39;ll need to create a manual mapping:
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>----------------------------------------------------------------------
+<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>mapping = {
+<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a>    &quot;LPV1_label&quot;: ???,  # Replace ??? with your label value
+<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a>    &quot;LA_myo_label&quot;: ???,  # Replace ??? with your label value
+<a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a>    &quot;LPV1_ring_label&quot;: ???,  # Replace ??? with your label value
+<a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a>}
+<a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a>----------------------------------------------------------------------
+</code></pre></div></p>
+<p><strong>Exit codes:</strong>
+- <code>0</code> - Mapping successfully suggested
+- <code>1</code> - Cannot auto-detect (manual mapping needed)</p>
+<p><strong>Use this to:</strong>
+- Quick fix for Slicer reset scenario
+- Generate starter template for manual mapping
+- Automate mapping in scripts</p>
+<hr />
+<h2 id="typical-workflows">Typical Workflows<a class="headerlink" href="#typical-workflows" title="Permanent link">&para;</a></h2>
+<h3 id="workflow-1-quick-label-inspection">Workflow 1: Quick Label Inspection<a class="headerlink" href="#workflow-1-quick-label-inspection" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1"># What labels are in my image?</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>show<span class="w"> </span>--input<span class="w"> </span>seg.nrrd
+</code></pre></div>
+<hr />
+<h3 id="workflow-2-pre-flight-check">Workflow 2: Pre-Flight Check<a class="headerlink" href="#workflow-2-pre-flight-check" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Will this work with lpv1_ring schematic?</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>check<span class="w"> </span>--input<span class="w"> </span>seg.nrrd<span class="w"> </span>--schematic<span class="w"> </span>lpv1_ring
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="c1"># Exit code 0 = good to go</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="c1"># Exit code 1 = need remapping</span>
+</code></pre></div>
+<hr />
+<h3 id="workflow-3-slicer-reset-recovery">Workflow 3: Slicer Reset Recovery<a class="headerlink" href="#workflow-3-slicer-reset-recovery" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1"># Step 1: Check what happened</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>show<span class="w"> </span>--input<span class="w"> </span>seg_from_slicer.nrrd
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="c1"># Output: [1, 2, 3] instead of [8, 104, 208]</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="c1"># Step 2: Auto-generate mapping</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>suggest<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">    </span>--input<span class="w"> </span>seg_from_slicer.nrrd<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">    </span>--schematic<span class="w"> </span>lpv1_ring<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">    </span>--output<span class="w"> </span>my_mapping.json
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="c1"># Step 3: Use mapping in Python</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>python
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a>&gt;&gt;&gt;<span class="w"> </span>import<span class="w"> </span>json
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a>&gt;&gt;&gt;<span class="w"> </span>with<span class="w"> </span>open<span class="o">(</span><span class="s1">&#39;my_mapping.json&#39;</span><span class="o">)</span><span class="w"> </span>as<span class="w"> </span>f:
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a>...<span class="w">     </span><span class="nv">mapping</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>json.load<span class="o">(</span>f<span class="o">)</span>
+<a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a>&gt;&gt;&gt;<span class="w"> </span>
+<a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a>&gt;&gt;&gt;<span class="w"> </span>from<span class="w"> </span>pycemrg_image_analysis<span class="w"> </span>import<span class="w"> </span>ImageAnalysisScaffolder
+<a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a>&gt;&gt;&gt;<span class="w"> </span><span class="nv">scaffolder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>ImageAnalysisScaffolder<span class="o">()</span>
+<a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a>&gt;&gt;&gt;<span class="w"> </span>scaffolder.scaffold_components_with_mapping<span class="o">(</span>
+<a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a>...<span class="w">     </span><span class="nv">output_dir</span><span class="o">=</span><span class="s2">&quot;config/&quot;</span>,
+<a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a>...<span class="w">     </span><span class="nv">component_names</span><span class="o">=[</span><span class="s2">&quot;lpv1_ring&quot;</span><span class="o">]</span>,
+<a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a>...<span class="w">     </span><span class="nv">label_mapping</span><span class="o">=</span>mapping
+<a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a>...<span class="w"> </span><span class="o">)</span>
+</code></pre></div>
+<hr />
+<h3 id="workflow-4-batch-validation">Workflow 4: Batch Validation<a class="headerlink" href="#workflow-4-batch-validation" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="ch">#!/bin/bash</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="c1"># validate_all_segs.sh</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="k">for</span><span class="w"> </span>seg<span class="w"> </span><span class="k">in</span><span class="w"> </span>data/*.nrrd<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Checking </span><span class="nv">$seg</span><span class="s2">...&quot;</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">    </span>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>check<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">        </span>--input<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$seg</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">        </span>--schematic<span class="w"> </span>biventricular_basic
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$?</span><span class="w"> </span>-ne<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a><span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  ❌ FAILED: </span><span class="nv">$seg</span><span class="s2">&quot;</span>
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="w">    </span><span class="k">else</span>
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;  ✅ OK: </span><span class="nv">$seg</span><span class="s2">&quot;</span>
+<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a><span class="w">    </span><span class="k">fi</span>
+<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="k">done</span>
+</code></pre></div>
+<hr />
+<h2 id="tips">Tips<a class="headerlink" href="#tips" title="Permanent link">&para;</a></h2>
+<h3 id="tip-1-piping-output">Tip 1: Piping Output<a class="headerlink" href="#tip-1-piping-output" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1"># Save label info to file</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>show<span class="w"> </span>--input<span class="w"> </span>seg.nrrd<span class="w"> </span>&gt;<span class="w"> </span>labels_report.txt
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="c1"># Count non-zero labels</span>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>show<span class="w"> </span>--input<span class="w"> </span>seg.nrrd<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;●&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l
+</code></pre></div>
+<h3 id="tip-2-scripting-with-exit-codes">Tip 2: Scripting with Exit Codes<a class="headerlink" href="#tip-2-scripting-with-exit-codes" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1"># Only proceed if labels match</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="k">if</span><span class="w"> </span>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>check<span class="w"> </span>--input<span class="w"> </span>seg.nrrd<span class="w"> </span>--schematic<span class="w"> </span>lpv1_ring<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Labels match - running workflow&quot;</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">    </span>python<span class="w"> </span>run_workflow.py
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="k">else</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Labels don&#39;t match - fix labels first&quot;</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="k">fi</span>
+</code></pre></div>
+<h3 id="tip-3-quick-schematic-lookup">Tip 3: Quick Schematic Lookup<a class="headerlink" href="#tip-3-quick-schematic-lookup" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="c1"># Find ring schematics</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>python<span class="w"> </span>scripts/utilities/labels.py<span class="w"> </span>list-schematics<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span>ring
+</code></pre></div>
+<hr />
+<h2 id="error-messages">Error Messages<a class="headerlink" href="#error-messages" title="Permanent link">&para;</a></h2>
+<h3 id="file-not-found">"File not found"<a class="headerlink" href="#file-not-found" title="Permanent link">&para;</a></h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>❌<span class="w"> </span>Error:<span class="w"> </span>File<span class="w"> </span>not<span class="w"> </span>found:<span class="w"> </span>seg.nrrd
+</code></pre></div>
+<strong>Fix:</strong> Check file path and extension (.nrrd, .nii, .nii.gz)</p>
+<h3 id="invalid-schematic">"Invalid schematic"<a class="headerlink" href="#invalid-schematic" title="Permanent link">&para;</a></h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>❌<span class="w"> </span>Error:<span class="w"> </span>Schematic<span class="w"> </span><span class="s1">&#39;invalid_name&#39;</span><span class="w"> </span>not<span class="w"> </span>found
+</code></pre></div>
+<strong>Fix:</strong> Run <code>list-schematics</code> to see valid names</p>
+<h3 id="cannot-auto-detect-mapping">"Cannot auto-detect mapping"<a class="headerlink" href="#cannot-auto-detect-mapping" title="Permanent link">&para;</a></h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>⚠️  Cannot auto-detect mapping
+</code></pre></div>
+<strong>Fix:</strong> Create manual mapping using the template provided in output</p>
+<hr />
+<h2 id="integration-with-python-api">Integration with Python API<a class="headerlink" href="#integration-with-python-api" title="Permanent link">&para;</a></h2>
+<p>The CLI wraps the Python API. For programmatic access, use:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pycemrg_image_analysis.utilities.label_tools</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>    <span class="n">LabelDiagnostic</span><span class="p">,</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>    <span class="n">LabelRemapper</span><span class="p">,</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>    <span class="n">check_labels</span><span class="p">,</span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="p">)</span>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="c1"># Equivalent to: labels.py check</span>
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="n">diagnostic</span> <span class="o">=</span> <span class="n">LabelDiagnostic</span><span class="p">()</span>
+<a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="n">report</span> <span class="o">=</span> <span class="n">diagnostic</span><span class="o">.</span><span class="n">check_image_against_schematic</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">schematic</span><span class="p">)</span>
+<a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a>
+<a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="c1"># Equivalent to: labels.py suggest</span>
+<a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="n">remapper</span> <span class="o">=</span> <span class="n">LabelRemapper</span><span class="p">()</span>
+<a id="__codelineno-26-13" name="__codelineno-26-13" href="#__codelineno-26-13"></a><span class="n">mapping</span> <span class="o">=</span> <span class="n">remapper</span><span class="o">.</span><span class="n">suggest_mapping_from_report</span><span class="p">(</span><span class="n">report</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Python API:</strong> <code>src/pycemrg_image_analysis/utilities/label_tools.py</code></li>
+<li><strong>Examples:</strong> <code>examples/label_remapping_workflow.py</code></li>
+<li><strong>Tests:</strong> <code>tests/unit/test_label_tools.py</code></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
