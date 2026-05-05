@@ -1,0 +1,1639 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Cardiac image segmentation post-processing library — CEMRG, Imperial College London">
+      
+      
+      
+        <link rel="canonical" href="https://openheartdevelopers.github.io/pycemrg-image-analysis/api/augmentation/">
+      
+      
+        <link rel="prev" href="../spatial/">
+      
+      
+        <link rel="next" href="../metrics/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Augmentation - pycemrg-image-analysis</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#pycemrg_image_analysisutilitiesaugmentation-api-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="pycemrg-image-analysis" class="md-header__button md-logo" aria-label="pycemrg-image-analysis" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            pycemrg-image-analysis
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Augmentation
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="deep-orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/OpenHeartDevelopers/pycemrg-image-analysis" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    OpenHeartDevelopers/pycemrg-image-analysis
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../overview/" class="md-tabs__link">
+          
+  
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../cli/labels/" class="md-tabs__link">
+          
+  
+  
+  CLI
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guides/add_myocardium_component/" class="md-tabs__link">
+          
+  
+  
+  Developer Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="pycemrg-image-analysis" class="md-nav__button md-logo" aria-label="pycemrg-image-analysis" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    pycemrg-image-analysis
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/OpenHeartDevelopers/pycemrg-image-analysis" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    OpenHeartDevelopers/pycemrg-image-analysis
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview & Patterns
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recipes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recipes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../components/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Components
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../label_tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Label Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../spatial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spatial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Augmentation
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Augmentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intensity-augmentation-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intensity Augmentation Functions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Intensity Augmentation Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#augment_brightness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        augment_brightness()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#augment_contrast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        augment_contrast()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#augment_gamma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        augment_gamma()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#augment_noise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        augment_noise()
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spatial-augmentation-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spatial Augmentation Functions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Spatial Augmentation Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create_slice_shifted_volumes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_slice_shifted_volumes()
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-augmentation-pipeline-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Augmentation Pipeline Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roi-aware-augmentation-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ROI-Aware Augmentation Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#design-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design Principles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#expected-training-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Training Impact
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependencies
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-utilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Utilities
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    CLI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/labels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Labels
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/add_myocardium_component/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add a Myocardium Component
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#intensity-augmentation-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Intensity Augmentation Functions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Intensity Augmentation Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#augment_brightness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        augment_brightness()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#augment_contrast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        augment_contrast()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#augment_gamma" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        augment_gamma()
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#augment_noise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        augment_noise()
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#spatial-augmentation-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spatial Augmentation Functions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Spatial Augmentation Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create_slice_shifted_volumes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        create_slice_shifted_volumes()
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-augmentation-pipeline-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Augmentation Pipeline Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#roi-aware-augmentation-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ROI-Aware Augmentation Example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#design-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Design Principles
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#expected-training-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Training Impact
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependencies
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-utilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related Utilities
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="pycemrg_image_analysisutilitiesaugmentation-api-reference"><code>pycemrg_image_analysis.utilities.augmentation</code> API Reference<a class="headerlink" href="#pycemrg_image_analysisutilitiesaugmentation-api-reference" title="Permanent link">&para;</a></h1>
+<p><strong>Module:</strong> Data augmentation for medical image analysis to increase effective dataset size.</p>
+<p><strong>Convention:</strong> 
+- Intensity functions expect pre-normalized <code>[0, 1]</code> data in <code>(Z, Y, X)</code> format
+- Spatial functions operate on <code>sitk.Image</code> objects with metadata</p>
+<hr />
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>This module provides two types of augmentation:</p>
+<ol>
+<li><strong>Intensity Augmentation</strong> - Modify voxel intensities (NumPy-based)</li>
+<li><strong>Spatial Augmentation</strong> - Modify spatial sampling (SimpleITK-based)</li>
+</ol>
+<hr />
+<h2 id="intensity-augmentation-functions">Intensity Augmentation Functions<a class="headerlink" href="#intensity-augmentation-functions" title="Permanent link">&para;</a></h2>
+<p>All intensity functions follow the same pattern:
+- Input: <code>np.ndarray</code> in <code>(Z, Y, X)</code> format, normalized to <code>[0, 1]</code>
+- Output: <code>np.ndarray</code> in <code>(Z, Y, X)</code> format, clipped to <code>[0, 1]</code>
+- Support ROI-aware augmentation via optional <code>mask</code> parameter
+- Support reproducibility via <code>seed</code> parameter</p>
+<hr />
+<h3 id="augment_brightness"><code>augment_brightness()</code><a class="headerlink" href="#augment_brightness" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">augment_brightness</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">volume</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</code></pre></div>
+<p>Randomly adjust image brightness by adding uniform random shift.</p>
+<p><strong>Parameters:</strong>
+- <code>volume</code> (np.ndarray): Input volume in <code>(Z, Y, X)</code> format, normalized to <code>[0, 1]</code>
+- <code>factor</code> (float, optional): Maximum brightness change as fraction (e.g., <code>0.1</code> = ±10%). Default: <code>0.1</code>
+- <code>mask</code> (np.ndarray, optional): Binary mask in <code>(Z, Y, X)</code> format. Augmentation applied only where <code>mask &gt; 0</code>
+- <code>seed</code> (int, optional): Random seed for reproducibility</p>
+<p><strong>Returns:</strong>
+- <code>np.ndarray</code>: Volume with adjusted brightness, clipped to <code>[0, 1]</code></p>
+<p><strong>Raises:</strong>
+- <code>ValueError</code>: If input not normalized to <code>[0, 1]</code> or mask shape mismatches</p>
+<p><strong>Implementation:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>brightness_shift = uniform(-factor, +factor)
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>output = clip(input + brightness_shift, 0, 1)
+</code></pre></div></p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pycemrg_image_analysis.utilities.intensity</span><span class="w"> </span><span class="kn">import</span> <span class="n">normalize_min_max</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pycemrg_image_analysis.utilities.augmentation</span><span class="w"> </span><span class="kn">import</span> <span class="n">augment_brightness</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Normalize volume</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">volume</span> <span class="o">=</span> <span class="n">normalize_min_max</span><span class="p">(</span><span class="n">raw_volume</span><span class="p">)</span>  <span class="c1"># [0, 1]</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Apply brightness augmentation</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">augmented</span> <span class="o">=</span> <span class="n">augment_brightness</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="c1"># ROI-aware augmentation</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="n">myo_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">segmentation</span> <span class="o">==</span> <span class="n">myo_label</span><span class="p">)</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="n">augmented</span> <span class="o">=</span> <span class="n">augment_brightness</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">myo_mask</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</code></pre></div></p>
+<hr />
+<h3 id="augment_contrast"><code>augment_contrast()</code><a class="headerlink" href="#augment_contrast" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">augment_contrast</span><span class="p">(</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">volume</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</code></pre></div>
+<p>Randomly adjust image contrast by scaling around mean value.</p>
+<p><strong>Parameters:</strong>
+- <code>volume</code> (np.ndarray): Input volume in <code>(Z, Y, X)</code> format, normalized to <code>[0, 1]</code>
+- <code>factor</code> (float, optional): Maximum contrast change as fraction. Default: <code>0.1</code>
+- <code>mask</code> (np.ndarray, optional): Binary mask. If provided, mean is computed only within mask
+- <code>seed</code> (int, optional): Random seed for reproducibility</p>
+<p><strong>Returns:</strong>
+- <code>np.ndarray</code>: Volume with adjusted contrast, clipped to <code>[0, 1]</code></p>
+<p><strong>Raises:</strong>
+- <code>ValueError</code>: If input not normalized to <code>[0, 1]</code> or mask shape mismatches</p>
+<p><strong>Implementation:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>contrast_factor = uniform(1 - factor, 1 + factor)
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>mean = compute_mean(input, mask)
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>output = clip(mean + contrast_factor * (input - mean), 0, 1)
+</code></pre></div></p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">augmented</span> <span class="o">=</span> <span class="n">augment_contrast</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="c1"># Contrast scaled by factor in [0.85, 1.15]</span>
+</code></pre></div></p>
+<hr />
+<h3 id="augment_gamma"><code>augment_gamma()</code><a class="headerlink" href="#augment_gamma" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">augment_gamma</span><span class="p">(</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="n">volume</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    <span class="n">gamma_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">),</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</code></pre></div>
+<p>Apply random gamma correction (non-linear intensity transformation).</p>
+<p><strong>Parameters:</strong>
+- <code>volume</code> (np.ndarray): Input volume in <code>(Z, Y, X)</code> format, normalized to <code>[0, 1]</code>
+- <code>gamma_range</code> (Tuple[float, float], optional): <code>(min_gamma, max_gamma)</code> range. Values <code>&lt; 1</code> brighten, values <code>&gt; 1</code> darken. Default: <code>(0.8, 1.2)</code>
+- <code>mask</code> (np.ndarray, optional): Binary mask for ROI-aware augmentation
+- <code>seed</code> (int, optional): Random seed for reproducibility</p>
+<p><strong>Returns:</strong>
+- <code>np.ndarray</code>: Gamma-corrected volume</p>
+<p><strong>Raises:</strong>
+- <code>ValueError</code>: If input not normalized, <code>gamma_range</code> is invalid, or mask shape mismatches</p>
+<p><strong>Implementation:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>gamma = uniform(gamma_range[0], gamma_range[1])
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>output = input ** gamma
+</code></pre></div></p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">augmented</span> <span class="o">=</span> <span class="n">augment_gamma</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">gamma_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">),</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="c1"># Non-linear intensity transform</span>
+</code></pre></div></p>
+<hr />
+<h3 id="augment_noise"><code>augment_noise()</code><a class="headerlink" href="#augment_noise" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">augment_noise</span><span class="p">(</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    <span class="n">volume</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="n">noise_std</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>    <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</code></pre></div>
+<p>Add Gaussian noise to simulate scanner thermal noise.</p>
+<p><strong>Parameters:</strong>
+- <code>volume</code> (np.ndarray): Input volume in <code>(Z, Y, X)</code> format, normalized to <code>[0, 1]</code>
+- <code>noise_std</code> (float, optional): Standard deviation of Gaussian noise. Typical: <code>0.01-0.05</code>. Default: <code>0.01</code>
+- <code>mask</code> (np.ndarray, optional): Binary mask. Noise added only where <code>mask &gt; 0</code>
+- <code>seed</code> (int, optional): Random seed for reproducibility</p>
+<p><strong>Returns:</strong>
+- <code>np.ndarray</code>: Volume with added noise, clipped to <code>[0, 1]</code></p>
+<p><strong>Raises:</strong>
+- <code>ValueError</code>: If input not normalized to <code>[0, 1]</code> or mask shape mismatches</p>
+<p><strong>Implementation:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>noise = normal(0, noise_std, shape=input.shape)
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>output = clip(input + noise, 0, 1)
+</code></pre></div></p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">augmented</span> <span class="o">=</span> <span class="n">augment_noise</span><span class="p">(</span><span class="n">volume</span><span class="p">,</span> <span class="n">noise_std</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="c1"># Gaussian noise with std=0.02 added</span>
+</code></pre></div></p>
+<hr />
+<h2 id="spatial-augmentation-functions">Spatial Augmentation Functions<a class="headerlink" href="#spatial-augmentation-functions" title="Permanent link">&para;</a></h2>
+<h3 id="create_slice_shifted_volumes"><code>create_slice_shifted_volumes()</code><a class="headerlink" href="#create_slice_shifted_volumes" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">create_slice_shifted_volumes</span><span class="p">(</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    <span class="n">img</span><span class="p">:</span> <span class="n">sitk</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="n">target_z_spacing</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>    <span class="n">num_shifts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    <span class="n">preserve_extent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    <span class="n">interpolator</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">sitk</span><span class="o">.</span><span class="n">sitkLinear</span><span class="p">,</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">sitk</span><span class="o">.</span><span class="n">Image</span><span class="p">]</span>
+</code></pre></div>
+<p>Create multiple downsampled volumes by shifting the starting slice. <strong>Standard practice for z-axis super-resolution training.</strong></p>
+<p><strong>Parameters:</strong>
+- <code>img</code> (sitk.Image): Input high-resolution SimpleITK image
+- <code>target_z_spacing</code> (float): Desired coarse z-spacing in mm (e.g., <code>8.0</code>)
+- <code>num_shifts</code> (int, optional): Number of shifted versions to create. Will be clamped to <code>floor(target_z_spacing / original_z_spacing)</code>. Default: <code>16</code>
+- <code>preserve_extent</code> (bool, optional): Maintain same physical extent as input (required for FAE coordinate consistency). Default: <code>True</code>
+- <code>interpolator</code> (int, optional): SimpleITK interpolator. Default: <code>sitk.sitkLinear</code></p>
+<p><strong>Returns:</strong>
+- <code>List[sitk.Image]</code>: List of downsampled images, each starting at a different z-offset</p>
+<p><strong>Raises:</strong>
+- <code>ValueError</code>: If <code>target_z_spacing &lt;= original z-spacing</code> (must be downsampling)</p>
+<p><strong>How It Works:</strong></p>
+<p>Given high-res scan with 0.5mm z-spacing, target 8.0mm z-spacing:
+- <strong>Step size:</strong> <code>8.0 / 0.5 = 16</code> slices
+- <strong>Shift 0:</strong> Keeps slices <code>[0, 16, 32, 48, ...]</code>
+- <strong>Shift 1:</strong> Keeps slices <code>[1, 17, 33, 49, ...]</code>
+- <strong>Shift 2:</strong> Keeps slices <code>[2, 18, 34, 50, ...]</code>
+- ...
+- <strong>Shift 15:</strong> Keeps slices <code>[15, 31, 47, 63, ...]</code></p>
+<p>Each shifted volume sees <strong>different anatomical z-positions</strong> → legitimate training data diversity.</p>
+<p><strong>Example:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pycemrg_image_analysis.utilities.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_image</span><span class="p">,</span> <span class="n">save_image</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pycemrg_image_analysis.utilities.augmentation</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_slice_shifted_volumes</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># Load high-res scan: [0.33, 0.33, 0.5]mm</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">img</span> <span class="o">=</span> <span class="n">load_image</span><span class="p">(</span><span class="s2">&quot;patient_001.nii.gz&quot;</span><span class="p">)</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="c1"># Create 16 shifted versions at 8mm z-spacing</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="n">shifted_volumes</span> <span class="o">=</span> <span class="n">create_slice_shifted_volumes</span><span class="p">(</span>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>    <span class="n">img</span><span class="o">=</span><span class="n">img</span><span class="p">,</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>    <span class="n">target_z_spacing</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>    <span class="n">num_shifts</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>    <span class="n">preserve_extent</span><span class="o">=</span><span class="kc">True</span>  <span class="c1"># Required for FAE training</span>
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="p">)</span>
+<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a>
+<a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a><span class="c1"># Save all shifted versions</span>
+<a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">vol</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">shifted_volumes</span><span class="p">):</span>
+<a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a>    <span class="n">save_image</span><span class="p">(</span><span class="n">vol</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;train/patient_001_shift</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">.nii.gz&quot;</span><span class="p">)</span>
+<a id="__codelineno-13-18" name="__codelineno-13-18" href="#__codelineno-13-18"></a>
+<a id="__codelineno-13-19" name="__codelineno-13-19" href="#__codelineno-13-19"></a><span class="c1"># Result: 16 training samples from 1 scan (16× data increase)</span>
+</code></pre></div></p>
+<p><strong>Notes:</strong>
+- Effective dataset size increases by <code>num_shifts×</code>
+- All volumes maintain consistent physical extent (when <code>preserve_extent=True</code>)
+- This is <strong>LEGITIMATE augmentation</strong> (not artificial data)
+- Only works for downsampling (cannot upsample with this method)</p>
+<hr />
+<h2 id="complete-augmentation-pipeline-example">Complete Augmentation Pipeline Example<a class="headerlink" href="#complete-augmentation-pipeline-example" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pycemrg_image_analysis.utilities.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_image</span><span class="p">,</span> <span class="n">save_image</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pycemrg_image_analysis.utilities.intensity</span><span class="w"> </span><span class="kn">import</span> <span class="n">normalize_min_max</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pycemrg_image_analysis.utilities.augmentation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    <span class="n">create_slice_shifted_volumes</span><span class="p">,</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>    <span class="n">augment_brightness</span><span class="p">,</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    <span class="n">augment_contrast</span><span class="p">,</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>    <span class="n">augment_gamma</span><span class="p">,</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="n">augment_noise</span><span class="p">,</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="p">)</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="kn">import</span><span class="w"> </span><span class="nn">SimpleITK</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sitk</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="c1"># ============================================================</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="c1"># Step 1: Load and normalize high-res scan</span>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="c1"># ============================================================</span>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="n">img</span> <span class="o">=</span> <span class="n">load_image</span><span class="p">(</span><span class="s2">&quot;patient_001.nii.gz&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>
+<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="c1"># Normalize to [0, 1]</span>
+<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="n">volume</span> <span class="o">=</span> <span class="n">sitk</span><span class="o">.</span><span class="n">GetArrayFromImage</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>  <span class="c1"># (Z, Y, X)</span>
+<a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="n">volume_norm</span> <span class="o">=</span> <span class="n">normalize_min_max</span><span class="p">(</span><span class="n">volume</span><span class="p">)</span>
+<a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a>
+<a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a><span class="n">img_norm</span> <span class="o">=</span> <span class="n">sitk</span><span class="o">.</span><span class="n">GetImageFromArray</span><span class="p">(</span><span class="n">volume_norm</span><span class="p">)</span>
+<a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a><span class="n">img_norm</span><span class="o">.</span><span class="n">CopyInformation</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+<a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a>
+<a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a><span class="c1"># ============================================================</span>
+<a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a><span class="c1"># Step 2: Generate slice-shifted versions (spatial augmentation)</span>
+<a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a><span class="c1"># ============================================================</span>
+<a id="__codelineno-14-28" name="__codelineno-14-28" href="#__codelineno-14-28"></a><span class="n">shifted_volumes</span> <span class="o">=</span> <span class="n">create_slice_shifted_volumes</span><span class="p">(</span>
+<a id="__codelineno-14-29" name="__codelineno-14-29" href="#__codelineno-14-29"></a>    <span class="n">img_norm</span><span class="p">,</span>
+<a id="__codelineno-14-30" name="__codelineno-14-30" href="#__codelineno-14-30"></a>    <span class="n">target_z_spacing</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span>
+<a id="__codelineno-14-31" name="__codelineno-14-31" href="#__codelineno-14-31"></a>    <span class="n">num_shifts</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+<a id="__codelineno-14-32" name="__codelineno-14-32" href="#__codelineno-14-32"></a>    <span class="n">preserve_extent</span><span class="o">=</span><span class="kc">True</span>
+<a id="__codelineno-14-33" name="__codelineno-14-33" href="#__codelineno-14-33"></a><span class="p">)</span>
+<a id="__codelineno-14-34" name="__codelineno-14-34" href="#__codelineno-14-34"></a>
+<a id="__codelineno-14-35" name="__codelineno-14-35" href="#__codelineno-14-35"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">shifted_volumes</span><span class="p">)</span><span class="si">}</span><span class="s2"> slice-shifted volumes&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-36" name="__codelineno-14-36" href="#__codelineno-14-36"></a>
+<a id="__codelineno-14-37" name="__codelineno-14-37" href="#__codelineno-14-37"></a><span class="c1"># ============================================================</span>
+<a id="__codelineno-14-38" name="__codelineno-14-38" href="#__codelineno-14-38"></a><span class="c1"># Step 3: Apply intensity augmentation to each shift</span>
+<a id="__codelineno-14-39" name="__codelineno-14-39" href="#__codelineno-14-39"></a><span class="c1"># ============================================================</span>
+<a id="__codelineno-14-40" name="__codelineno-14-40" href="#__codelineno-14-40"></a><span class="k">for</span> <span class="n">shift_idx</span><span class="p">,</span> <span class="n">shifted_img</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">shifted_volumes</span><span class="p">):</span>
+<a id="__codelineno-14-41" name="__codelineno-14-41" href="#__codelineno-14-41"></a>    <span class="c1"># Convert to NumPy for intensity augmentation</span>
+<a id="__codelineno-14-42" name="__codelineno-14-42" href="#__codelineno-14-42"></a>    <span class="n">shifted_array</span> <span class="o">=</span> <span class="n">sitk</span><span class="o">.</span><span class="n">GetArrayFromImage</span><span class="p">(</span><span class="n">shifted_img</span><span class="p">)</span>  <span class="c1"># (Z, Y, X)</span>
+<a id="__codelineno-14-43" name="__codelineno-14-43" href="#__codelineno-14-43"></a>
+<a id="__codelineno-14-44" name="__codelineno-14-44" href="#__codelineno-14-44"></a>    <span class="c1"># Create 3 intensity variants per shift</span>
+<a id="__codelineno-14-45" name="__codelineno-14-45" href="#__codelineno-14-45"></a>    <span class="k">for</span> <span class="n">variant_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+<a id="__codelineno-14-46" name="__codelineno-14-46" href="#__codelineno-14-46"></a>        <span class="c1"># Compose intensity augmentations</span>
+<a id="__codelineno-14-47" name="__codelineno-14-47" href="#__codelineno-14-47"></a>        <span class="n">augmented</span> <span class="o">=</span> <span class="n">shifted_array</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<a id="__codelineno-14-48" name="__codelineno-14-48" href="#__codelineno-14-48"></a>
+<a id="__codelineno-14-49" name="__codelineno-14-49" href="#__codelineno-14-49"></a>        <span class="n">seed_base</span> <span class="o">=</span> <span class="n">shift_idx</span> <span class="o">*</span> <span class="mi">1000</span> <span class="o">+</span> <span class="n">variant_idx</span>
+<a id="__codelineno-14-50" name="__codelineno-14-50" href="#__codelineno-14-50"></a>
+<a id="__codelineno-14-51" name="__codelineno-14-51" href="#__codelineno-14-51"></a>        <span class="c1"># Apply augmentation chain</span>
+<a id="__codelineno-14-52" name="__codelineno-14-52" href="#__codelineno-14-52"></a>        <span class="n">augmented</span> <span class="o">=</span> <span class="n">augment_brightness</span><span class="p">(</span>
+<a id="__codelineno-14-53" name="__codelineno-14-53" href="#__codelineno-14-53"></a>            <span class="n">augmented</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed_base</span> <span class="o">+</span> <span class="mi">0</span>
+<a id="__codelineno-14-54" name="__codelineno-14-54" href="#__codelineno-14-54"></a>        <span class="p">)</span>
+<a id="__codelineno-14-55" name="__codelineno-14-55" href="#__codelineno-14-55"></a>        <span class="n">augmented</span> <span class="o">=</span> <span class="n">augment_contrast</span><span class="p">(</span>
+<a id="__codelineno-14-56" name="__codelineno-14-56" href="#__codelineno-14-56"></a>            <span class="n">augmented</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed_base</span> <span class="o">+</span> <span class="mi">1</span>
+<a id="__codelineno-14-57" name="__codelineno-14-57" href="#__codelineno-14-57"></a>        <span class="p">)</span>
+<a id="__codelineno-14-58" name="__codelineno-14-58" href="#__codelineno-14-58"></a>        <span class="n">augmented</span> <span class="o">=</span> <span class="n">augment_gamma</span><span class="p">(</span>
+<a id="__codelineno-14-59" name="__codelineno-14-59" href="#__codelineno-14-59"></a>            <span class="n">augmented</span><span class="p">,</span> <span class="n">gamma_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">),</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed_base</span> <span class="o">+</span> <span class="mi">2</span>
+<a id="__codelineno-14-60" name="__codelineno-14-60" href="#__codelineno-14-60"></a>        <span class="p">)</span>
+<a id="__codelineno-14-61" name="__codelineno-14-61" href="#__codelineno-14-61"></a>        <span class="n">augmented</span> <span class="o">=</span> <span class="n">augment_noise</span><span class="p">(</span>
+<a id="__codelineno-14-62" name="__codelineno-14-62" href="#__codelineno-14-62"></a>            <span class="n">augmented</span><span class="p">,</span> <span class="n">noise_std</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed_base</span> <span class="o">+</span> <span class="mi">3</span>
+<a id="__codelineno-14-63" name="__codelineno-14-63" href="#__codelineno-14-63"></a>        <span class="p">)</span>
+<a id="__codelineno-14-64" name="__codelineno-14-64" href="#__codelineno-14-64"></a>
+<a id="__codelineno-14-65" name="__codelineno-14-65" href="#__codelineno-14-65"></a>        <span class="c1"># Convert back to SimpleITK</span>
+<a id="__codelineno-14-66" name="__codelineno-14-66" href="#__codelineno-14-66"></a>        <span class="n">augmented_img</span> <span class="o">=</span> <span class="n">sitk</span><span class="o">.</span><span class="n">GetImageFromArray</span><span class="p">(</span><span class="n">augmented</span><span class="p">)</span>
+<a id="__codelineno-14-67" name="__codelineno-14-67" href="#__codelineno-14-67"></a>        <span class="n">augmented_img</span><span class="o">.</span><span class="n">CopyInformation</span><span class="p">(</span><span class="n">shifted_img</span><span class="p">)</span>
+<a id="__codelineno-14-68" name="__codelineno-14-68" href="#__codelineno-14-68"></a>
+<a id="__codelineno-14-69" name="__codelineno-14-69" href="#__codelineno-14-69"></a>        <span class="c1"># Save augmented volume</span>
+<a id="__codelineno-14-70" name="__codelineno-14-70" href="#__codelineno-14-70"></a>        <span class="n">output_path</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-14-71" name="__codelineno-14-71" href="#__codelineno-14-71"></a>            <span class="sa">f</span><span class="s2">&quot;train/patient_001_shift</span><span class="si">{</span><span class="n">shift_idx</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">_int</span><span class="si">{</span><span class="n">variant_idx</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">.nii.gz&quot;</span>
+<a id="__codelineno-14-72" name="__codelineno-14-72" href="#__codelineno-14-72"></a>        <span class="p">)</span>
+<a id="__codelineno-14-73" name="__codelineno-14-73" href="#__codelineno-14-73"></a>        <span class="n">save_image</span><span class="p">(</span><span class="n">augmented_img</span><span class="p">,</span> <span class="n">output_path</span><span class="p">)</span>
+<a id="__codelineno-14-74" name="__codelineno-14-74" href="#__codelineno-14-74"></a>
+<a id="__codelineno-14-75" name="__codelineno-14-75" href="#__codelineno-14-75"></a><span class="c1"># ============================================================</span>
+<a id="__codelineno-14-76" name="__codelineno-14-76" href="#__codelineno-14-76"></a><span class="c1"># Result: 16 shifts × 3 intensity variants = 48 training volumes</span>
+<a id="__codelineno-14-77" name="__codelineno-14-77" href="#__codelineno-14-77"></a><span class="c1"># ============================================================</span>
+<a id="__codelineno-14-78" name="__codelineno-14-78" href="#__codelineno-14-78"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Created 48 augmented training volumes from 1 scan (48× increase)&quot;</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="roi-aware-augmentation-example">ROI-Aware Augmentation Example<a class="headerlink" href="#roi-aware-augmentation-example" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pycemrg_image_analysis.utilities.augmentation</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>    <span class="n">augment_brightness</span><span class="p">,</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>    <span class="n">augment_contrast</span><span class="p">,</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>    <span class="n">augment_noise</span><span class="p">,</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">)</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="c1"># Load volume and segmentation</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="n">volume</span> <span class="o">=</span> <span class="n">normalize_min_max</span><span class="p">(</span><span class="n">raw_volume</span><span class="p">)</span>  <span class="c1"># (Z, Y, X), [0, 1]</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="n">segmentation</span> <span class="o">=</span> <span class="n">load_segmentation</span><span class="p">()</span>  <span class="c1"># (Z, Y, X), integer labels</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="c1"># Create ROI mask (e.g., augment only myocardium)</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="n">myo_label</span> <span class="o">=</span> <span class="mi">500</span>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="n">myo_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">segmentation</span> <span class="o">==</span> <span class="n">myo_label</span><span class="p">)</span>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="c1"># Apply intensity augmentation only to myocardium</span>
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a><span class="n">augmented</span> <span class="o">=</span> <span class="n">volume</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a><span class="n">augmented</span> <span class="o">=</span> <span class="n">augment_brightness</span><span class="p">(</span><span class="n">augmented</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">myo_mask</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a><span class="n">augmented</span> <span class="o">=</span> <span class="n">augment_contrast</span><span class="p">(</span><span class="n">augmented</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">myo_mask</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">43</span><span class="p">)</span>
+<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a><span class="n">augmented</span> <span class="o">=</span> <span class="n">augment_noise</span><span class="p">(</span><span class="n">augmented</span><span class="p">,</span> <span class="n">noise_std</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">myo_mask</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">44</span><span class="p">)</span>
+<a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a>
+<a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a><span class="c1"># Result: Only myocardium intensities changed, background unchanged</span>
+</code></pre></div>
+<hr />
+<h2 id="design-principles">Design Principles<a class="headerlink" href="#design-principles" title="Permanent link">&para;</a></h2>
+<ol>
+<li>
+<p><strong>Normalized Input Required:</strong> All intensity functions expect <code>[0, 1]</code> range for consistent augmentation magnitudes across different scans</p>
+</li>
+<li>
+<p><strong>Composability:</strong> Functions can be chained without intermediate conversions (all NumPy-based for intensity)</p>
+</li>
+<li>
+<p><strong>Reproducibility:</strong> All functions accept <code>seed</code> parameter for deterministic augmentation pipelines</p>
+</li>
+<li>
+<p><strong>ROI-Aware:</strong> Optional <code>mask</code> parameter enables targeted augmentation (e.g., augment only tissue, not background)</p>
+</li>
+<li>
+<p><strong>Metadata Preservation:</strong> Spatial augmentation maintains SimpleITK metadata (origin, spacing, direction)</p>
+</li>
+<li>
+<p><strong>Legitimate Augmentation:</strong> Slice-shift is not artificial data—it samples real anatomical positions at different z-offsets</p>
+</li>
+</ol>
+<hr />
+<h2 id="expected-training-impact">Expected Training Impact<a class="headerlink" href="#expected-training-impact" title="Permanent link">&para;</a></h2>
+<p><strong>Without augmentation (38 scans):</strong>
+- Training data: 38 volumes
+- FAE training MSE: plateaus at 9e-3 (underfitting)</p>
+<p><strong>With full augmentation (38 scans):</strong>
+- Slice-shift: 16× increase → 608 volumes
+- Intensity variants: 3× increase → 1,824 volumes
+- FAE training MSE: target 1e-3 to 1e-4 (proper convergence)</p>
+<hr />
+<h2 id="dependencies">Dependencies<a class="headerlink" href="#dependencies" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>numpy</code>: Core array operations</li>
+<li><code>SimpleITK</code>: Spatial augmentation and medical image I/O</li>
+<li><code>pycemrg_image_analysis.utilities.artifact_simulation.downsample_volume()</code>: Used internally by <code>create_slice_shifted_volumes()</code></li>
+</ul>
+<hr />
+<h2 id="related-utilities">Related Utilities<a class="headerlink" href="#related-utilities" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>pycemrg_image_analysis.utilities.intensity.normalize_min_max()</code>: Normalize volumes to <code>[0, 1]</code> before augmentation</li>
+<li><code>pycemrg_image_analysis.utilities.artifact_simulation.downsample_volume()</code>: Downsample with extent preservation</li>
+<li><code>pycemrg_image_analysis.utilities.io</code>: Load/save SimpleITK images</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "search.highlight", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
