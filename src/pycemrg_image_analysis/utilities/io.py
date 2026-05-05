@@ -77,6 +77,8 @@ _INR_DTYPE_MAP = {
     ("float",          64): np.float64,
 }
 
+_NP_TO_INR_DTYPE = {v: k for k, v in _INR_DTYPE_MAP.items()}
+
 
 def convert_inr_to_image(inr_path: Path) -> sitk.Image:
     """
@@ -123,6 +125,53 @@ def convert_inr_to_image(inr_path: Path) -> sitk.Image:
         data = data.reshape((xdim, ydim, zdim), order="F")
 
     return array_to_image(data, origin=(0.0, 0.0, 0.0), spacing=spacing, numpy_is_xyz=True)
+
+
+def convert_image_to_inr(image: sitk.Image, inr_path: Path) -> None:
+    """
+    Writes a SimpleITK Image to an INR file.
+
+    INR stores voxels in Fortran (x-fastest) order. The array extracted from
+    sitk (z, y, x layout) is transposed to (x, y, z) before flattening.
+
+    INR headers carry no origin; the image origin is not written.
+    """
+    array = sitk.GetArrayFromImage(image)       # (z, y, x)
+    array = np.transpose(array, (2, 1, 0))      # → (x, y, z)
+
+    inr_type, pixsize = _NP_TO_INR_DTYPE.get(array.dtype.type, (None, None))
+    if inr_type is None:
+        raise ValueError(f"Unsupported numpy dtype for INR conversion: {array.dtype}")
+
+    xdim, ydim, zdim = array.shape
+    vx, vy, vz = image.GetSpacing()
+
+    header_core = (
+        "#INRIMAGE-4#{\n"
+        f"XDIM={xdim}\n"
+        f"YDIM={ydim}\n"
+        f"ZDIM={zdim}\n"
+        "VDIM=1\n"
+        f"TYPE={inr_type}\n"
+        f"PIXSIZE={pixsize} bits\n"
+        "SCALE=2**0\n"
+        "CPU=decm\n"
+        f"VX={vx}\n"
+        f"VY={vy}\n"
+        f"VZ={vz}\n"
+    )
+
+    terminator = "##}\n"
+    total = 256
+    while total < len(header_core) + len(terminator):
+        total += 256
+    padding = "\n" * (total - len(header_core) - len(terminator))
+    header = (header_core + padding + terminator).encode("utf-8")
+
+    inr_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(inr_path, "wb") as fh:
+        fh.write(header)
+        fh.write(array.tobytes(order="F"))
 
 
 def save_image_from_array(
