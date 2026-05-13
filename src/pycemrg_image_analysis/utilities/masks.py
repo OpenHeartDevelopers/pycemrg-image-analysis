@@ -8,7 +8,7 @@ import SimpleITK as sitk
 from pathlib import Path
 from enum import Enum, auto
 
-from pycemrg_image_analysis.logic.constants import ZERO_LABEL
+from pycemrg_image_analysis.utilities.constants import ZERO_LABEL
 
 # This enum is critical for our rule-based logic
 class MaskOperationMode(Enum):

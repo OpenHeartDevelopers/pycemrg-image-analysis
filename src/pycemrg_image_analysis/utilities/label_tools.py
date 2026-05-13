@@ -17,7 +17,7 @@ import numpy as np
 import SimpleITK as sitk
 
 from pycemrg.core.logs import setup_logging
-from pycemrg_image_analysis.utilities import load_image
+from pycemrg_image_analysis.utilities.io import load_image
 
 setup_logging()
 logger = logging.getLogger(__name__)

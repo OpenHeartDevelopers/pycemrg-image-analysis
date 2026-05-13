@@ -7,11 +7,11 @@ logic engines and the convenience builders.
 
 from pycemrg_image_analysis.logic.builders import SegmentationPathBuilder, MyocardiumPathBuilder  
 from pycemrg_image_analysis.logic.constants import (
-    MyocardiumSemanticRole, 
+    MyocardiumSemanticRole,
     ValveSemanticRole,
     RingSemanticRole,
-    ZERO_LABEL,
 )
+from pycemrg_image_analysis.utilities.constants import ZERO_LABEL
 from pycemrg_image_analysis.logic.contracts import (
     ApplicationStep,
     CylinderCreationContract,

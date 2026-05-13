@@ -4,7 +4,7 @@ import logging
 import numpy as np
 import SimpleITK as sitk
 
-from pycemrg_image_analysis.logic.constants import ZERO_LABEL
+from pycemrg_image_analysis.utilities.constants import ZERO_LABEL
 
 def and_filter(
     image: sitk.Image,
