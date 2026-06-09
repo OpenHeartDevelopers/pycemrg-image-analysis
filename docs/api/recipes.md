@@ -438,7 +438,7 @@ from pycemrg_image_analysis.recipes import get_recipe
 from examples.orchestrator_patterns import run_recipe_workflow
 
 result = run_recipe_workflow(
-    recipe_name="biventricular_basic",
+    "biventricular_basic",
     input_seg_path=Path("input.nrrd"),
     output_dir=Path("output/")
 )

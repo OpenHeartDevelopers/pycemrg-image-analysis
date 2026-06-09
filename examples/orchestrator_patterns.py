@@ -10,16 +10,21 @@ Each pattern is a complete, runnable function showing:
 - How to build contracts from semantic maps
 - How to execute steps in the correct order
 - How to handle dependencies between steps
+
+`run_recipe_workflow` is the reference runner used by the recipe-authoring
+guide (docs/guides/authoring_a_recipe.md). Note the engine API is not uniform:
+myocardium uses `MyocardiumLogic.create_from_semantic_map(image, label_manager,
+parameters, semantic_map)`, while valves and rings use `create_from_rule(contract)`.
+The dispatch in `run_recipe_workflow` reflects that asymmetry.
 """
 
 from pathlib import Path
 import json
-import dataclasses
-from typing import Optional
+from typing import Optional, Union, Dict
 
 from pycemrg.data.labels import LabelManager
 from pycemrg_image_analysis import ImageAnalysisScaffolder
-from pycemrg_image_analysis.recipes import get_recipe
+from pycemrg_image_analysis.recipes import get_recipe, Recipe
 from pycemrg_image_analysis.logic import (
     MyocardiumLogic,
     MyocardiumPathBuilder,
@@ -28,7 +33,6 @@ from pycemrg_image_analysis.logic import (
     MyocardiumSemanticRole,
     ValveSemanticRole,
     RingSemanticRole,
-    MyocardiumRule,
     ValveRule,
     RingRule,
     ApplicationStep,
@@ -48,48 +52,78 @@ import SimpleITK as sitk
 # =============================================================================
 
 def run_recipe_workflow(
-    recipe_name: str,
+    recipe: Union[str, Recipe],
     input_seg_path: Path,
     output_dir: Path,
     config_dir: Optional[Path] = None,
+    label_mapping: Optional[Dict[str, int]] = None,
+    extra_schematics: Optional[Dict[str, dict]] = None,
 ) -> sitk.Image:
     """
-    Execute a pre-defined recipe workflow.
-    
+    Execute a recipe workflow.
+
     This is the simplest pattern — let the recipe define what to do,
-    and execute each step in order.
-    
+    and execute each step in order. It works for both built-in recipes
+    (passed by name) and recipes you define in your own project (passed as
+    a Recipe object).
+
     Args:
-        recipe_name: Name from RECIPE_CATALOG (e.g., "biventricular_basic")
+        recipe: Either a catalog name (e.g., "biventricular_basic") or a
+            Recipe object you constructed yourself.
         input_seg_path: Path to input segmentation
         output_dir: Where to save intermediate results
         config_dir: Where to generate configs (default: output_dir/config)
-        
+        label_mapping: Optional {label_name: int} overriding the schematic
+            default voxel values. Use this when your segmentation's integer
+            labels differ from the schematic defaults (e.g., a Slicer 1..N
+            reset). When provided, configs are scaffolded with these values.
+        extra_schematics: Optional {name: schematic dict} registering schematics
+            defined in your own project, so a custom Recipe can reference
+            components that are not built into the library.
+
     Returns:
         Final segmentation image with all structures added
-        
+
     Example:
+        >>> # Built-in recipe, default labels
         >>> result = run_recipe_workflow(
         ...     "biventricular_basic",
         ...     Path("seg_input.nrrd"),
-        ...     Path("output/")
+        ...     Path("output/"),
+        ... )
+        >>>
+        >>> # Your own recipe + your own schematics + remapped labels
+        >>> result = run_recipe_workflow(
+        ...     MY_RECIPE,
+        ...     Path("seg_input.nrrd"),
+        ...     Path("output/"),
+        ...     label_mapping={"Foo_BP_label": 1, "Foo_myo_label": 5},
+        ...     extra_schematics=MY_SCHEMATICS,
         ... )
     """
     if config_dir is None:
         config_dir = output_dir / "config"
-    
+
     output_dir.mkdir(parents=True, exist_ok=True)
-    
-    # 1. Get recipe
-    recipe = get_recipe(recipe_name)
+
+    # 1. Resolve recipe (catalog name or a caller-supplied Recipe object)
+    if isinstance(recipe, str):
+        recipe = get_recipe(recipe)
     print(f"Running recipe: {recipe.name}")
     print(f"  {recipe.description}")
     print(f"  {len(recipe.steps)} steps")
-    
-    # 2. Scaffold all required configs at once
-    scaffolder = ImageAnalysisScaffolder()
-    scaffolder.scaffold_components(config_dir, recipe.required_schematics)
-    
+
+    # 2. Scaffold all required configs at once. With a label_mapping, the
+    #    scaffolded labels.yaml uses the caller's integer values instead of
+    #    the schematic defaults.
+    scaffolder = ImageAnalysisScaffolder(extra_schematics=extra_schematics)
+    if label_mapping:
+        scaffolder.scaffold_components_with_mapping(
+            config_dir, recipe.required_schematics, label_mapping
+        )
+    else:
+        scaffolder.scaffold_components(config_dir, recipe.required_schematics)
+
     # 3. Load tools
     label_manager = LabelManager(config_path=config_dir / "labels.yaml")
     with open(config_dir / "parameters.json") as f:
@@ -109,13 +143,14 @@ def run_recipe_workflow(
         print(f"\nStep {i}/{len(recipe.steps)}: {step.step_type} - {step.component_name}")
         
         if step.step_type == "create":
-            contract = build_myocardium_contract(
-                step.component_name, current_seg, label_manager, 
-                parameters, config_dir, output_dir
+            semantic_map = load_myocardium_semantic_map(
+                step.component_name, config_dir
             )
-            current_seg = myo_logic.create_from_rule(contract)
-            save_image(current_seg, contract.output_path)
-            
+            current_seg = myo_logic.create_from_semantic_map(
+                current_seg, label_manager, parameters, semantic_map
+            )
+            save_image(current_seg, output_dir / f"{step.component_name}.nrrd")
+
         elif step.step_type == "valve":
             contract = build_valve_contract(
                 step.component_name, current_seg, label_manager,
@@ -138,16 +173,15 @@ def run_recipe_workflow(
             
         elif step.step_type == "push":
             contract = build_push_contract(
-                step.component_name, current_seg, label_manager,
-                parameters, config_dir
+                step.component_name, label_manager, parameters
             )
-            current_seg = myo_logic.push_structure(contract)
+            current_seg = myo_logic.push_structure(current_seg, contract)
             save_image(current_seg, output_dir / f"{step.component_name}.nrrd")
     
     # 5. Save final result
-    final_path = output_dir / f"seg_final_{recipe_name}.nrrd"
+    final_path = output_dir / f"seg_final_{recipe.name}.nrrd"
     save_image(current_seg, final_path)
-    print(f"\n✅ Recipe complete. Final output: {final_path}")
+    print(f"\nRecipe complete. Final output: {final_path}")
     
     return current_seg
 
@@ -211,13 +245,12 @@ def biventricular_with_specific_valves(
     for component in ["lv_outflow", "rv_myocardium", "aortic_wall"]:
         if component not in components:
             continue
-            
-        contract = build_myocardium_contract(
-            component, current_seg, label_manager,
-            parameters, config_dir, output_dir
+
+        semantic_map = load_myocardium_semantic_map(component, config_dir)
+        current_seg = myo_logic.create_from_semantic_map(
+            current_seg, label_manager, parameters, semantic_map
         )
-        current_seg = myo_logic.create_from_rule(contract)
-        save_image(current_seg, contract.output_path)
+        save_image(current_seg, output_dir / f"{component}.nrrd")
     
     # 4. Then create valves
     valve_map = {
@@ -276,12 +309,11 @@ def left_atrium_with_efficient_rings(
     current_seg = load_image(input_seg_path)
     
     # 3. Create LA myocardium
-    la_myo_contract = build_myocardium_contract(
-        "la_myocardium", current_seg, label_manager,
-        parameters, config_dir, output_dir
+    la_myo_map = load_myocardium_semantic_map("la_myocardium", config_dir)
+    current_seg = myo_logic.create_from_semantic_map(
+        current_seg, label_manager, parameters, la_myo_map
     )
-    current_seg = myo_logic.create_from_rule(la_myo_contract)
-    save_image(current_seg, la_myo_contract.output_path)
+    save_image(current_seg, output_dir / "la_myocardium.nrrd")
     
     # 4. Pre-compute LA myocardium threshold (efficiency pattern)
     print("Pre-computing LA myocardium threshold for ring trimming...")
@@ -321,43 +353,30 @@ def left_atrium_with_efficient_rings(
 # CONTRACT BUILDER HELPERS
 # =============================================================================
 
-def build_myocardium_contract(
+def load_myocardium_semantic_map(
     component_name: str,
-    current_seg: sitk.Image,
-    label_manager: LabelManager,
-    parameters: dict,
     config_dir: Path,
-    output_dir: Path,
-):
-    """Build MyocardiumCreationContract from semantic map."""
+) -> dict:
+    """
+    Load a scaffolded semantic map as a role-keyed dict.
+
+    `MyocardiumLogic.create_from_semantic_map` consumes the semantic map
+    directly (no contract, no rule). The on-disk JSON uses the role enum
+    *names* as keys; this converts them back to `MyocardiumSemanticRole`
+    members. The APPLICATION_STEPS list is left as raw dicts because the
+    engine parses each step's "MODE"/"RULE_LABEL_NAMES" itself.
+
+    Args:
+        component_name: Component whose map to load (e.g., "la_myocardium").
+        config_dir: Directory containing semantic_maps/<component_name>.json.
+
+    Returns:
+        dict[MyocardiumSemanticRole, Any] ready for create_from_semantic_map.
+    """
     map_path = config_dir / "semantic_maps" / f"{component_name}.json"
     with open(map_path) as f:
         raw_map = json.load(f)
-        semantic_map = {MyocardiumSemanticRole[k]: v for k, v in raw_map.items()}
-    
-    application_steps = [
-        ApplicationStep(
-            mode=MaskOperationMode[step["MODE"]],
-            rule_label_names=step["RULE_LABEL_NAMES"]
-        )
-        for step in semantic_map[MyocardiumSemanticRole.APPLICATION_STEPS]
-    ]
-    
-    rule = MyocardiumRule(
-        source_bp_label_name=semantic_map[MyocardiumSemanticRole.SOURCE_BLOOD_POOL_NAME],
-        target_myo_label_name=semantic_map[MyocardiumSemanticRole.TARGET_MYOCARDIUM_NAME],
-        wall_thickness_parameter_name=semantic_map[MyocardiumSemanticRole.WALL_THICKNESS_PARAMETER_NAME],
-        application_steps=application_steps
-    )
-    
-    from pycemrg_image_analysis.logic import MyocardiumCreationContract
-    return MyocardiumCreationContract(
-        input_image=current_seg,
-        label_manager=label_manager,
-        parameters=parameters,
-        output_path=output_dir / f"{component_name}.nrrd",
-        rule=rule
-    )
+    return {MyocardiumSemanticRole[k]: v for k, v in raw_map.items()}
 
 
 def build_valve_contract(
@@ -444,20 +463,74 @@ def build_ring_contract(
     )
 
 
+# Push steps have no semantic map (the "myo_push_steps" schematic only
+# supplies the labels and parameters). Each push is defined here by which
+# wall pushes which structure inward. The values are label/parameter *names*
+# resolved against the scaffolded config at build time. To add a push step,
+# add an entry here and reference its key as a WorkflowStep("push", <key>).
+_PUSH_STEP_DEFINITIONS = {
+    "part_push_aorta": {
+        "pusher_wall": "Ao_wall_label",
+        "pushed_wall": "PArt_wall_label",
+        "pushed_bp": "PArt_BP_label",
+        "thickness_param": "PArt_WT",
+    },
+    "part_push_lv": {
+        "pusher_wall": "LV_myo_label",
+        "pushed_wall": "PArt_wall_label",
+        "pushed_bp": "PArt_BP_label",
+        "thickness_param": "PArt_WT",
+    },
+    "la_push_aorta": {
+        "pusher_wall": "Ao_wall_label",
+        "pushed_wall": "LA_myo_label",
+        "pushed_bp": "LA_BP_label",
+        "thickness_param": "LA_WT",
+    },
+    "rv_push_aorta": {
+        "pusher_wall": "Ao_wall_label",
+        "pushed_wall": "RV_myo_label",
+        "pushed_bp": "RV_BP_label",
+        "thickness_param": "RV_WT",
+    },
+}
+
+
 def build_push_contract(
     component_name: str,
-    current_seg: sitk.Image,
     label_manager: LabelManager,
     parameters: dict,
-    config_dir: Path,
-):
-    """Build PushStructureContract from semantic map."""
-    # Push steps use a different pattern - parameters are in the schematic
-    # but the contract is built directly, not from semantic roles
-    
-    # This is a simplified version - actual implementation would need
-    # to map component_name to specific push operation parameters
-    raise NotImplementedError(
-        "Push contract building is workflow-specific. "
-        "See test_myocardium_no_cuts.py for examples."
+) -> PushStructureContract:
+    """
+    Build a PushStructureContract for a named push step.
+
+    Unlike create/valve/ring steps, push steps are not driven by a semantic
+    map. The mapping from step name to the four contract fields lives in
+    `_PUSH_STEP_DEFINITIONS`; this resolves those label/parameter names to
+    concrete values for the current segmentation.
+
+    Args:
+        component_name: Push step key (e.g., "part_push_aorta").
+        label_manager: Resolves label names to integer voxel values.
+        parameters: Scaffolded parameters dict (wall thicknesses).
+
+    Returns:
+        PushStructureContract ready for MyocardiumLogic.push_structure().
+
+    Raises:
+        KeyError: If component_name is not a defined push step.
+    """
+    if component_name not in _PUSH_STEP_DEFINITIONS:
+        available = ", ".join(_PUSH_STEP_DEFINITIONS)
+        raise KeyError(
+            f"Unknown push step '{component_name}'. "
+            f"Defined push steps: {available}"
+        )
+
+    spec = _PUSH_STEP_DEFINITIONS[component_name]
+    return PushStructureContract(
+        pusher_wall_label=label_manager.get_value(spec["pusher_wall"]),
+        pushed_wall_label=label_manager.get_value(spec["pushed_wall"]),
+        pushed_bp_label=label_manager.get_value(spec["pushed_bp"]),
+        pushed_wall_thickness=parameters[spec["thickness_param"]],
     )

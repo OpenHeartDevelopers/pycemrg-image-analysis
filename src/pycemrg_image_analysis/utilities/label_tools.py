@@ -166,24 +166,24 @@ class LabelDiagnostic:
         print(f"\nSchematic expects {len(report.expected_labels)} labels:")
         
         if report.has_issues:
-            print(f"\n❌ ISSUES FOUND:")
+            print(f"\nISSUES FOUND:")
             print(f"\nMissing labels ({len(report.missing_labels)}):")
             for m in report.missing_labels:
-                print(f"  • {m.label_name}: expected {m.expected_value}, NOT FOUND in image")
-            
+                print(f"  - {m.label_name}: expected {m.expected_value}, NOT FOUND in image")
+
             if report.ok_labels:
-                print(f"\n✓ Matching labels ({len(report.ok_labels)}):")
+                print(f"\nMatching labels ({len(report.ok_labels)}):")
                 for m in report.ok_labels:
-                    print(f"  • {m.label_name}: {m.expected_value} ✓")
-            
-            print(f"\n💡 SUGGESTION:")
+                    print(f"  - {m.label_name}: {m.expected_value} [ok]")
+
+            print(f"\nSUGGESTION:")
             print(f"   Your image has different label values than the schematic expects.")
             print(f"   Use LabelRemapper to create a custom mapping, or manually edit")
             print(f"   the labels.yaml file with your actual label values.")
         else:
-            print(f"\n✅ ALL LABELS MATCH")
+            print(f"\nALL LABELS MATCH")
             for m in report.ok_labels:
-                print(f"  • {m.label_name}: {m.expected_value} ✓")
+                print(f"  - {m.label_name}: {m.expected_value} [ok]")
         
         print(f"{'='*70}\n")
 

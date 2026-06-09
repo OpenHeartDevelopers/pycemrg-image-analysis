@@ -50,4 +50,5 @@ nav:
   - CLI:
     - Labels: cli/labels.md
   - Developer Guides:
+    - Authoring a New Recipe: guides/authoring_a_recipe.md
     - Add a Myocardium Component: guides/add_myocardium_component.md

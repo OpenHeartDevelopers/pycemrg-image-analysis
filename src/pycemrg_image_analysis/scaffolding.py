@@ -17,6 +17,49 @@ class ImageAnalysisScaffolder(ConfigScaffolder):
 
     _COMPONENT_SCHEMATICS = ALL_SCHEMATICS
 
+    def __init__(self, *args, extra_schematics: Dict[str, dict] = None, **kwargs):
+        """
+        Args:
+            extra_schematics: Optional mapping of component name -> schematic dict
+                to register alongside the built-in schematics. Use this to author
+                schematics in your own project without editing this library.
+                Each schematic must provide "labels", "parameters", and
+                "semantic_map" keys (the same shape as the built-in schematics).
+                Entries here override built-ins with the same name.
+
+        Example:
+            >>> MY_SCHEMATICS = {
+            ...     "my_new_wall": {
+            ...         "labels": {"Foo_BP_label": 9, "Foo_myo_label": 109},
+            ...         "parameters": {"Foo_WT": 2.5},
+            ...         "semantic_map": {...},
+            ...     }
+            ... }
+            >>> scaffolder = ImageAnalysisScaffolder(extra_schematics=MY_SCHEMATICS)
+            >>> scaffolder.scaffold_components(out_dir, ["my_new_wall"])
+        """
+        super().__init__(*args, **kwargs)
+        if extra_schematics:
+            self._validate_schematics(extra_schematics)
+            # Instance-level merge shadows the class attribute; built-ins remain
+            # available and injected entries win on name collision.
+            self._COMPONENT_SCHEMATICS = {**ALL_SCHEMATICS, **extra_schematics}
+
+    @staticmethod
+    def _validate_schematics(schematics: Dict[str, dict]) -> None:
+        """Fail early if an injected schematic is missing required keys."""
+        required_keys = {"labels", "parameters", "semantic_map"}
+        for name, schematic in schematics.items():
+            if not isinstance(schematic, dict):
+                raise ValueError(
+                    f"Schematic '{name}' must be a dict, got {type(schematic)}"
+                )
+            missing = required_keys - schematic.keys()
+            if missing:
+                raise ValueError(
+                    f"Schematic '{name}' is missing required keys: {sorted(missing)}"
+                )
+
     def scaffold_components(
         self,
         output_dir: Union[str, Path],
