@@ -45,5 +45,8 @@ dependencies = [
 Homepage = "https://github.com/OpenHeartDevelopers/pycemrg-image-analysis" # not set up yet
 "Bug Tracker" = "https://github.com/OpenHeartDevelopers/pycemrg-image-analysis/issues" # not set up yet
 
+[project.scripts]
+pycemrg-ima = "pycemrg_image_analysis.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -16,6 +16,11 @@ By the end you will have:
 If you only want to *run* an existing recipe (e.g. `biventricular_basic`), skip to
 [Step 5](#step-5-run-it) and pass an existing recipe name.
 
+!!! tip "Want a command-by-command walkthrough?"
+    The [Custom Heartbuilder Pipeline](../tutorials/custom_heartbuilder.md)
+    tutorial applies this guide step by step against a fresh project — install,
+    `labels.yaml`, and your first schematic. Keep this page open alongside it.
+
 ---
 
 ## Mental model

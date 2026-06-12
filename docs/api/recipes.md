@@ -473,3 +473,9 @@ This single function call handles:
 - Only need one or two components
 
 For most orchestration tasks, starting with a recipe simplifies development significantly.
+
+## See Also
+
+- **[Architecture](overview.md)** — the orchestration pattern a recipe's steps plug into.
+- **[Components](components.md)** — connected-component cleanup often used alongside recipe steps.
+- **Next step:** [Authoring a Recipe](../guides/authoring_a_recipe.md) to build your own.

@@ -293,3 +293,9 @@ else:
 
 - `numpy`: Core array operations
 - `scikit-image`: SSIM computation (`skimage.metrics.structural_similarity`)
+
+## See Also
+
+- **[Augmentation](augmentation.md)** — generate the training data these metrics validate.
+- **[I/O Utilities](io.md)** — load the predicted/ground-truth volumes to compare.
+- **[API Reference](index.md)** — the full toolbox map.

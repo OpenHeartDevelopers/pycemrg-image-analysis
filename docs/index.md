@@ -21,24 +21,59 @@ into analysis-ready cardiac models. It handles:
 
 ---
 
-## Quick start
+## Where to go next
 
-```python
-from pathlib import Path
-from pycemrg_image_analysis.recipes import get_recipe
-from pycemrg_image_analysis import ImageAnalysisScaffolder
-from pycemrg_image_analysis.utilities import load_image, save_image
+<div class="grid cards" markdown>
 
-# 1. Pick a recipe
-recipe = get_recipe("biventricular_basic")
+-   :material-rocket-launch:{ .lg .middle } __Getting Started__
 
-# 2. Scaffold config files
-scaffolder = ImageAnalysisScaffolder()
-scaffolder.scaffold_components(Path("config/"), recipe.required_schematics)
+    ---
 
-# 3. Load your segmentation and run the workflow
-#    (see API > Overview for the full orchestration pattern)
-```
+    Install the library and run your first scaffolded workflow.
+
+    [:octicons-arrow-right-24: Getting Started](getting-started/index.md)
+
+-   :material-sitemap:{ .lg .middle } __Architecture__
+
+    ---
+
+    The stateless-toolbox philosophy and the canonical orchestration pattern.
+
+    [:octicons-arrow-right-24: Architecture](api/overview.md)
+
+-   :material-book-open-variant:{ .lg .middle } __Recipes & Workflows__
+
+    ---
+
+    Named, ordered workflows for common cardiac models.
+
+    [:octicons-arrow-right-24: Recipes](api/recipes.md)
+
+-   :material-toolbox:{ .lg .middle } __API Reference__
+
+    ---
+
+    The toolbox map: components, I/O, spatial, label tools, augmentation, metrics.
+
+    [:octicons-arrow-right-24: API Reference](api/index.md)
+
+-   :material-console:{ .lg .middle } __CLI__
+
+    ---
+
+    Command-line label inspection and remapping.
+
+    [:octicons-arrow-right-24: CLI Reference](cli/labels.md)
+
+-   :material-hammer-wrench:{ .lg .middle } __Developer Guides__
+
+    ---
+
+    SOPs for extending the library with your own schematics and recipes.
+
+    [:octicons-arrow-right-24: Developer Guides](guides/authoring_a_recipe.md)
+
+</div>
 
 ---
 
@@ -50,26 +85,6 @@ scaffolder.scaffold_components(Path("config/"), recipe.required_schematics)
 | **Explicit contracts** | Every logic call is driven by a frozen dataclass (`*CreationContract`) |
 | **Orchestrator owns I/O** | Your script handles file paths, config loading, and step sequencing |
 | **No singletons / globals** | All dependencies are injected at construction time |
-
----
-
-## Navigation
-
-- **[API Reference →](api/overview.md)** — Architecture guide and full module reference
-- **[CLI Reference →](cli/labels.md)** — Command-line tools for label inspection and remapping
-- **[Developer Guides →](guides/add_myocardium_component.md)** — SOPs for extending the library
-
----
-
-## Installation
-
-```bash
-pip install pycemrg-image-analysis
-# or, in editable mode from source:
-pip install -e .
-```
-
-**Requires Python ≥ 3.10**
 
 ---
 

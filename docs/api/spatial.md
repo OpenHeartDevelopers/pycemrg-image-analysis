@@ -218,3 +218,9 @@ intensity_field[indices] = values
 ---
 
 **Full API:** See extended `spatial.py` docstrings for detailed documentation.
+
+## See Also
+
+- **[I/O Utilities](io.md)** — load the images you query in physical space.
+- **[Components](components.md)** — connected-component operations on the same images.
+- **[API Reference](index.md)** — the full toolbox map.

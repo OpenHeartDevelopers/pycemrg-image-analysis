@@ -421,3 +421,9 @@ augmented = augment_noise(augmented, noise_std=0.02, mask=myo_mask, seed=44)
 - `pycemrg_image_analysis.utilities.intensity.normalize_min_max()`: Normalize volumes to `[0, 1]` before augmentation
 - `pycemrg_image_analysis.utilities.artifact_simulation.downsample_volume()`: Downsample with extent preservation
 - `pycemrg_image_analysis.utilities.io`: Load/save SimpleITK images
+
+## See Also
+
+- **[Metrics](metrics.md)** — validate augmented/interpolated volumes (MSE, PSNR, SSIM).
+- **[I/O Utilities](io.md)** — load and save the volumes you augment.
+- **[Spatial Queries](spatial.md)** — voxel ↔ physical mapping for ROI-aware augmentation.
