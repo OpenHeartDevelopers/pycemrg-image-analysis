@@ -326,28 +326,145 @@ MY_RECIPE = Recipe(
     overwrite anatomy an earlier one placed. Grow a blood pool's myocardium
     *before* any valve, ring, or push that references it.
 
-!!! note "Need a *push* step?"
-    A push (e.g. a structure that intrudes on a neighbour and must be pushed back)
-    is the one step type with **no** schematic of its own, it reuses existing
-    labels and is wired in the orchestrator's push registry, not in
-    `myschematics.py`. Add it to your recipe as `WorkflowStep("push", "...")` and
-    define its four fields per
-    [Authoring guide, Step 4](../guides/authoring_a_recipe.md#step-4-handle-push-steps-only-if-your-recipe-has-them).
+### 3.5 A push that lives only in the recipe (the internal pulmonary artery)
 
-### 3.5 Run it
+Some corrections are not new *structures* at all, they are **pushes**: one wall
+intrudes on a neighbour, so you erode the neighbour's blood-pool rim and relabel
+it as that neighbour's wall. A clinical example: a patient whose **pulmonary
+artery (PArt) sits between the atria**. Grown normally, the PArt wall bites into
+the LA and RA myocardium. The fix is *not* a new schematic, the PArt wall and the
+atrial labels already exist. You only need new **push steps**, and they surface
+in exactly two places:
 
-Drive the recipe with the reference runner (`run_recipe_workflow` in
-`examples/orchestrator_patterns.py`, it is example code you can import or copy
-into your project), passing your `Recipe` object and your schematics:
+1. the **orchestrator's push registry** (the four fields: who pushes whom), and
+2. the **recipe** (where, in the order, the push runs).
+
+Nothing in `myschematics.py` changes. This is the mirror image of `rv_outflow`:
+that was a new *structure* (a schematic); this is a new *rule* (recipe + wiring).
+
+#### 3.5.1 Define the push fields (orchestrator registry)
+
+A push has no `semantic_map`; it is four label/parameter *names*. The PArt is the
+`pusher_wall`; each atrium is the victim whose blood pool is eroded into its own
+wall. Add these to the push registry in your copied orchestrator (the example
+`_PUSH_STEP_DEFINITIONS` in `examples/orchestrator_patterns.py`):
+
+```python
+# in your project's orchestrator, merged into _PUSH_STEP_DEFINITIONS
+CUSTOM_PUSH_DEFINITIONS = {
+    "part_push_la": {
+        "pusher_wall":     "PArt_wall_label",  # the intruding PArt wall
+        "pushed_wall":     "LA_myo_label",     # LA grows a wall here
+        "pushed_bp":       "LA_BP_label",      # LA cavity eroded back
+        "thickness_param": "LA_WT",
+    },
+    "part_push_ra": {
+        "pusher_wall":     "PArt_wall_label",
+        "pushed_wall":     "RA_myo_label",
+        "pushed_bp":       "RA_BP_label",
+        "thickness_param": "RA_WT",
+    },
+}
+
+# _PUSH_STEP_DEFINITIONS = {**_PUSH_STEP_DEFINITIONS, **CUSTOM_PUSH_DEFINITIONS}
+```
+
+The four fields are documented in
+[Authoring guide, Step 4](../guides/authoring_a_recipe.md#step-4-handle-push-steps-only-if-your-recipe-has-them).
+
+!!! info "Why there is no `extra_pushes=` hook"
+    Schematics inject cleanly via `extra_schematics=`. Push definitions have no
+    equivalent argument yet, so you register them by editing the push registry in
+    your copied orchestrator. Their labels and thicknesses still come from
+    scaffolded config (the `myo_push_steps` schematic plus the atrial/PArt
+    schematics), so only the four-field *wiring* is manual.
+
+#### 3.5.2 The recipe: four chamber + `rv_outflow` + the PArt pushes
+
+Now assemble it. This is the built-in four-chamber flow, with your custom
+`rv_outflow` added **alongside** the built-in `rv_myocardium` (both write
+`RV_myo_label`, layered by step order), plus the two PArt pushes inserted after
+the atria exist. Add to `myrecipes.py`:
+
+```python
+# src/tutorial_custom_heart/myrecipes.py (continued)
+from pycemrg_image_analysis.recipes import Recipe, WorkflowStep
+
+FOUR_CHAMBER_INTERNAL_PART = Recipe(
+    name="four_chamber_internal_part",
+    description="Four-chamber heart with a custom RV outflow and an internal "
+                "pulmonary artery pushed out of the atrial walls.",
+    steps=[
+        # --- Outflow necks (rv_outflow mirrors lv_outflow) ---
+        WorkflowStep("create", "lv_outflow"),
+        WorkflowStep("create", "rv_outflow"),          # your new schematic (3.3.2)
+        # --- Great vessels ---
+        WorkflowStep("create", "aortic_wall"),
+        WorkflowStep("create", "pulmonary_artery"),    # grows PArt_wall_label
+        WorkflowStep("push",   "part_push_aorta"),      # built-in: aorta pushes PArt
+        WorkflowStep("push",   "part_push_lv"),          # built-in: LV pushes PArt
+        # --- Main ventricular + atrial walls ---
+        WorkflowStep("create", "rv_myocardium"),         # built-in: main RV wall
+        WorkflowStep("create", "la_myocardium"),
+        WorkflowStep("create", "ra_myocardium"),
+        # --- NEW: the internal PArt pushes the atrial walls back ---
+        WorkflowStep("push",   "part_push_la"),
+        WorkflowStep("push",   "part_push_ra"),
+        WorkflowStep("push",   "la_push_aorta"),
+        WorkflowStep("push",   "rv_push_aorta"),
+        # --- Valves ---
+        WorkflowStep("valve", "mitral_valve"),
+        WorkflowStep("valve", "tricuspid_valve"),
+        WorkflowStep("valve", "aortic_valve"),
+        WorkflowStep("valve", "pulmonary_valve"),
+    ],
+    required_schematics=[
+        "lv_outflow", "rv_outflow",        # rv_outflow is custom (extra_schematics)
+        "aortic_wall", "pulmonary_artery",
+        "rv_myocardium", "la_myocardium", "ra_myocardium",
+        "myo_push_steps",                  # carries push labels + thicknesses
+        "mitral_valve", "tricuspid_valve", "aortic_valve", "pulmonary_valve",
+    ],
+)
+```
+
+Read the ordering against the load-bearing rule:
+
+- `rv_outflow` (`ADD`) and `rv_myocardium` (`REPLACE_ONLY` over `Ao_wall_label`)
+  both write `RV_myo_label`, so step order layers them; `rv_myocardium` runs
+  **after** `aortic_wall` so there is an `Ao_wall_label` for it to replace.
+- `part_push_la` / `part_push_ra` come **after** `create pulmonary_artery`,
+  because a push reads its `pusher_wall` (`PArt_wall_label`) — that wall must
+  already exist.
+- They come **after** `create la_myocardium` / `create ra_myocardium`, so each
+  atrium has its wall before the PArt reinforces it, and the atrial blood pools
+  (`LA_BP_label` / `RA_BP_label`) are still present to be eroded.
+
+For the push correction itself, notice what did **not** change: it added **no new
+schematic**. The pushes reused labels (`PArt_wall_label`, `LA_myo_label`,
+`RA_myo_label`, …) and parameters (`LA_WT`, `RA_WT`) the four-chamber schematics
+already define. (`rv_outflow` *is* a new schematic, but that is the new
+*structure* you authored in 3.3.2 — separate from the push.) The patient's
+unusual anatomy is captured by **recipe order + push wiring**.
+
+### 3.6 Run it
+
+Drive the recipe with `run_recipe_workflow`, passing your `Recipe` object and your
+schematics. A schematic-only recipe (like `MY_RECIPE` from 3.4) can use the
+reference runner straight from `examples/orchestrator_patterns.py`. The
+`FOUR_CHAMBER_INTERNAL_PART` recipe uses your custom push steps, so import the
+runner from **your copied orchestrator** — the one with `CUSTOM_PUSH_DEFINITIONS`
+merged into its push registry (3.5.1):
 
 ```python
 from pathlib import Path
-from examples.orchestrator_patterns import run_recipe_workflow
+# Your copied orchestrator, with CUSTOM_PUSH_DEFINITIONS merged into the registry:
+from tutorial_custom_heart.orchestrator import run_recipe_workflow
 from tutorial_custom_heart.myschematics import MY_SCHEMATICS
-from tutorial_custom_heart.myrecipes import MY_RECIPE
+from tutorial_custom_heart.myrecipes import FOUR_CHAMBER_INTERNAL_PART
 
 run_recipe_workflow(
-    MY_RECIPE,
+    FOUR_CHAMBER_INTERNAL_PART,
     input_seg_path=Path("seg_input.nrrd"),
     output_dir=Path("output/"),
     extra_schematics=MY_SCHEMATICS,
@@ -357,8 +474,8 @@ run_recipe_workflow(
 
 The runner scaffolds the config (including your `rv_outflow`), then executes each
 step in order, saving an intermediate image per step so you can see exactly where
-each structure landed. The final result is written as
-`output/seg_final_lv_rv_outflow.nrrd`.
+each structure landed — including the two PArt pushes reshaping the atrial walls.
+The final result is written as `output/seg_final_four_chamber_internal_part.nrrd`.
 
 ## See Also
 
