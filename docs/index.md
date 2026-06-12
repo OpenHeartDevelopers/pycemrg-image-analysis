@@ -23,57 +23,13 @@ into analysis-ready cardiac models. It handles:
 
 ## Where to go next
 
-<div class="grid cards" markdown>
-
--   :material-rocket-launch:{ .lg .middle } __Getting Started__
-
-    ---
-
-    Install the library and run your first scaffolded workflow.
-
-    [:octicons-arrow-right-24: Getting Started](getting-started/index.md)
-
--   :material-sitemap:{ .lg .middle } __Architecture__
-
-    ---
-
-    The stateless-toolbox philosophy and the canonical orchestration pattern.
-
-    [:octicons-arrow-right-24: Architecture](api/overview.md)
-
--   :material-book-open-variant:{ .lg .middle } __Recipes & Workflows__
-
-    ---
-
-    Named, ordered workflows for common cardiac models.
-
-    [:octicons-arrow-right-24: Recipes](api/recipes.md)
-
--   :material-toolbox:{ .lg .middle } __API Reference__
-
-    ---
-
-    The toolbox map: components, I/O, spatial, label tools, augmentation, metrics.
-
-    [:octicons-arrow-right-24: API Reference](api/index.md)
-
--   :material-console:{ .lg .middle } __CLI__
-
-    ---
-
-    Command-line label inspection and remapping.
-
-    [:octicons-arrow-right-24: CLI Reference](cli/labels.md)
-
--   :material-hammer-wrench:{ .lg .middle } __Developer Guides__
-
-    ---
-
-    SOPs for extending the library with your own schematics and recipes.
-
-    [:octicons-arrow-right-24: Developer Guides](guides/authoring_a_recipe.md)
-
-</div>
+- **[Getting Started](getting-started/index.md)** — install the library and run your first scaffolded workflow.
+- **[Tutorial: Custom Heartbuilder Pipeline](tutorials/custom_heartbuilder.md)** — a guided, command-by-command build from a fresh install.
+- **[Architecture](api/overview.md)** — the stateless-toolbox philosophy and the canonical orchestration pattern.
+- **[Recipes & Workflows](api/recipes.md)** — named, ordered workflows for common cardiac models.
+- **[API Reference](api/index.md)** — the toolbox map: components, I/O, spatial, label tools, augmentation, metrics.
+- **[CLI Reference](cli/labels.md)** — command-line label inspection and remapping.
+- **[Developer Guides](guides/authoring_a_recipe.md)** — SOPs for extending the library with your own schematics and recipes.
 
 ---
 
