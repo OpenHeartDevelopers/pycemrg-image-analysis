@@ -1,0 +1,2127 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Cardiac image segmentation post-processing library — CEMRG, Imperial College London">
+      
+      
+      
+        <link rel="canonical" href="https://openheartdevelopers.github.io/pycemrg-image-analysis/tutorials/custom_heartbuilder/">
+      
+      
+        <link rel="prev" href="../../getting-started/">
+      
+      
+        <link rel="next" href="../../api/overview/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Custom Heartbuilder Pipeline - pycemrg-image-analysis</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#create-a-custom-heartbuilder-pipeline" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="pycemrg-image-analysis" class="md-header__button md-logo" aria-label="pycemrg-image-analysis" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            pycemrg-image-analysis
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Custom Heartbuilder Pipeline
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="deep-orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/OpenHeartDevelopers/pycemrg-image-analysis" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    OpenHeartDevelopers/pycemrg-image-analysis
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../api/overview/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../api/recipes/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Recipes & Workflows
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../api/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../cli/labels/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CLI
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guides/authoring_a_recipe/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Developer Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="pycemrg-image-analysis" class="md-nav__button md-logo" aria-label="pycemrg-image-analysis" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    pycemrg-image-analysis
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/OpenHeartDevelopers/pycemrg-image-analysis" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    OpenHeartDevelopers/pycemrg-image-analysis
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Heartbuilder Pipeline
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Custom Heartbuilder Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#01-prerequisites-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1 Prerequisites (optional)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#02-create-your-project-folder-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.2 Create your project folder (optional)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-open-the-reference-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Open the reference guide
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-create-your-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Create your environment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Create your environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-install-the-pycemrg-libraries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Install the pycemrg libraries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-install-your-own-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Install your own project
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-plan-and-execute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Plan and execute
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Plan and execute">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-your-config-folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Your config folder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-edit-your-labelsyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Edit your labels.yaml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-create-your-own-schematic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Create your own schematic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.3 Create your own schematic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#331-you-dont-need-to-define-everything" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3.1 You don't need to define everything
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#332-author-a-new-structure-a-new-schematic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3.2 Author a new structure (a new schematic)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#333-register-your-schematic-no-library-edits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3.3 Register your schematic (no library edits)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-define-the-rules-and-order-a-recipe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Define the rules and order (a recipe)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-a-push-that-lives-only-in-the-recipe-the-internal-pulmonary-artery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 A push that lives only in the recipe (the internal pulmonary artery)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.5 A push that lives only in the recipe (the internal pulmonary artery)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#351-define-the-push-fields-orchestrator-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5.1 Define the push fields (orchestrator registry)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#352-the-recipe-four-chamber-rv_outflow-the-part-pushes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5.2 The recipe: four chamber + rv_outflow + the PArt pushes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#36-run-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.6 Run it
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/recipes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recipes & Workflows
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../api/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/components/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Components
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    I/O Utilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/spatial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spatial Queries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/label_tools/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Label Tools
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/augmentation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Augmentation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/labels/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Developer Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Developer Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/authoring_a_recipe/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authoring a Recipe
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/add_myocardium_component/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add a Myocardium Component
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#01-prerequisites-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.1 Prerequisites (optional)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#02-create-your-project-folder-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0.2 Create your project folder (optional)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-open-the-reference-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Open the reference guide
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-create-your-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Create your environment
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Create your environment">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-install-the-pycemrg-libraries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Install the pycemrg libraries
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-install-your-own-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Install your own project
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-plan-and-execute" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Plan and execute
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Plan and execute">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-your-config-folder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Your config folder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-edit-your-labelsyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Edit your labels.yaml
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-create-your-own-schematic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Create your own schematic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.3 Create your own schematic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#331-you-dont-need-to-define-everything" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3.1 You don't need to define everything
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#332-author-a-new-structure-a-new-schematic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3.2 Author a new structure (a new schematic)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#333-register-your-schematic-no-library-edits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3.3 Register your schematic (no library edits)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-define-the-rules-and-order-a-recipe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4 Define the rules and order (a recipe)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35-a-push-that-lives-only-in-the-recipe-the-internal-pulmonary-artery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5 A push that lives only in the recipe (the internal pulmonary artery)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3.5 A push that lives only in the recipe (the internal pulmonary artery)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#351-define-the-push-fields-orchestrator-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5.1 Define the push fields (orchestrator registry)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#352-the-recipe-four-chamber-rv_outflow-the-part-pushes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.5.2 The recipe: four chamber + rv_outflow + the PArt pushes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#36-run-it" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.6 Run it
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#see-also" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See Also
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="create-a-custom-heartbuilder-pipeline">Create a Custom Heartbuilder Pipeline<a class="headerlink" href="#create-a-custom-heartbuilder-pipeline" title="Permanent link">&para;</a></h1>
+<p>This hands-on tutorial takes you from nothing to a project that grows a custom
+cardiac model out of your own segmentation, using <strong>your own rules</strong>. By the end
+you will have a project folder, a <code>labels.yaml</code>, and your first custom schematic.</p>
+<p>Keep the <a href="../../guides/authoring_a_recipe/">Authoring a Recipe</a> guide open on the
+side. That's the mental model and reference; this page is the "type these
+commands now" path.</p>
+<div class="admonition note">
+<p class="admonition-title">Optional steps</p>
+<p>Steps <strong>0.x</strong> are optional. They help you get started quicker but are not
+compulsory, you can define your own project folder and structure, as long as
+you install the right libraries.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Path assumption</p>
+<p>This tutorial assumes your code lives under <code>~/code</code> and your project folder
+is <code>~/code/tutorial-custom-heart</code>. Adjust the paths if yours differ.</p>
+</div>
+<h2 id="01-prerequisites-optional">0.1 Prerequisites (optional)<a class="headerlink" href="#01-prerequisites-optional" title="Permanent link">&para;</a></h2>
+<p>Clone <code>pycemrg</code> and install it into an environment. This gives you the
+<code>pycemrg init</code> command, which scaffolds a whole project structure for you.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">conda</label><label for="__tabbed_1_2">venv</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/OpenHeartDevelopers/pycemrg.git
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>pycemrg
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>pycemrg<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.11<span class="w"> </span>-y
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>conda<span class="w"> </span>activate<span class="w"> </span>pycemrg
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/OpenHeartDevelopers/pycemrg.git
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">cd</span><span class="w"> </span>pycemrg
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>~/.venvs/pycemrg
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="nb">source</span><span class="w"> </span>~/.venvs/pycemrg/bin/activate
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</code></pre></div>
+</div>
+</div>
+</div>
+<h2 id="02-create-your-project-folder-optional">0.2 Create your project folder (optional)<a class="headerlink" href="#02-create-your-project-folder-optional" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>conda<span class="w"> </span>activate<span class="w"> </span>pycemrg<span class="w">              </span><span class="c1"># or activate your venv</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>pycemrg<span class="w"> </span>init<span class="w"> </span>tutorial-custom-heart<span class="w"> </span>--with-src<span class="w"> </span>--force
+</code></pre></div>
+<p>Your project is now in <code>~/code/tutorial-custom-heart</code>.</p>
+<h2 id="1-open-the-reference-guide">1. Open the reference guide<a class="headerlink" href="#1-open-the-reference-guide" title="Permanent link">&para;</a></h2>
+<p>Open <a href="../../guides/authoring_a_recipe/">Authoring a Recipe</a> and keep it on the
+side. It has the mental model and the steps to follow to create your own heart
+based on <strong>your rules</strong>.</p>
+<p>From here on, assume your project folder is <code>~/code/tutorial-custom-heart</code>.</p>
+<h2 id="2-create-your-environment">2. Create your environment<a class="headerlink" href="#2-create-your-environment" title="Permanent link">&para;</a></h2>
+<p>You can use <code>venv</code> or <code>conda</code>. Create a dedicated environment for the project:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">conda</label><label for="__tabbed_2_2">venv</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>tutorial-custom-heart<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.11<span class="w"> </span>-y
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>conda<span class="w"> </span>activate<span class="w"> </span>tutorial-custom-heart
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>~/code/tutorial-custom-heart/.venv
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">source</span><span class="w"> </span>~/code/tutorial-custom-heart/.venv/bin/activate
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="21-install-the-pycemrg-libraries">2.1 Install the <code>pycemrg</code> libraries<a class="headerlink" href="#21-install-the-pycemrg-libraries" title="Permanent link">&para;</a></h3>
+<p>These are not on PyPI yet, so install them editable from clones:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">cd</span><span class="w"> </span>~/code
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/OpenHeartDevelopers/pycemrg.git
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/OpenHeartDevelopers/pycemrg-image-analysis.git
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>~/code/pycemrg
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>~/code/pycemrg-image-analysis
+</code></pre></div>
+<h3 id="22-install-your-own-project">2.2 Install your own project<a class="headerlink" href="#22-install-your-own-project" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">cd</span><span class="w"> </span>~/code/tutorial-custom-heart
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+</code></pre></div>
+<h2 id="3-plan-and-execute">3. Plan and execute<a class="headerlink" href="#3-plan-and-execute" title="Permanent link">&para;</a></h2>
+<p>Normally you start from a segmentation with <strong>N</strong> labels and end up with one
+with <strong>M</strong> labels. For example, a normal 4-chamber heart starts with ~10 labels
+and ends up with 30+.</p>
+<h3 id="31-your-config-folder">3.1 Your <code>config</code> folder<a class="headerlink" href="#31-your-config-folder" title="Permanent link">&para;</a></h3>
+<p>This holds your <code>labels.yaml</code>. Create one from a template with <code>pycemrg
+init-labels</code>, which ships with your install:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>pycemrg<span class="w"> </span>init-labels<span class="w"> </span>-o<span class="w"> </span>config/labels.yaml<span class="w"> </span>--num-labels<span class="w"> </span><span class="m">34</span><span class="w"> </span>--num-groups<span class="w"> </span><span class="m">5</span>
+</code></pre></div>
+<ul>
+<li><code>--num-labels</code>: the total number of labels you'll end up with.</li>
+<li><code>--num-groups</code>: optional but helpful. For example, to collect all the
+  myocardia, create a <code>myocardium</code> group and list those labels in it.</li>
+</ul>
+<h3 id="32-edit-your-labelsyaml">3.2 Edit your <code>labels.yaml</code><a class="headerlink" href="#32-edit-your-labelsyaml" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Edit this manually, label values fail silently</p>
+<p>Look at your data in ITK-SNAP or 3D Slicer and choose the labels you want.
+If your file's integer label values don't match what your schematics expect,
+structures grow from the <strong>wrong voxels with no error</strong>. Get this right before
+running anything.</p>
+</div>
+<p>The generated file looks like:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nt">labels</span><span class="p">:</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">background</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="c1"># --- Auto-generated placeholder labels ---</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">structure_1</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nt">structure_2</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="nt">structure_3</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="c1"># ...</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="nt">groups</span><span class="p">:</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">  </span><span class="c1"># --- Auto-generated placeholder groups ---</span>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">  </span><span class="nt">group_a</span><span class="p">:</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">structure_1</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">structure_2</span>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">  </span><span class="c1"># ...</span>
+</code></pre></div>
+<p>Modify it to match your data and the labels you want for the generated
+structures. For example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">labels</span><span class="p">:</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">LV_bloodpool</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nt">LV_myo</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nt">RV_bloodpool</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="nt">LA_bloodpool</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="c1"># ...</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="nt">groups</span><span class="p">:</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">  </span><span class="nt">Bloodpool</span><span class="p">:</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LV_bloodpool</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RV_bloodpool</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LA_bloodpool</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="w">  </span><span class="c1"># ...</span>
+</code></pre></div>
+<h3 id="33-create-your-own-schematic">3.3 Create your own schematic<a class="headerlink" href="#33-create-your-own-schematic" title="Permanent link">&para;</a></h3>
+<p>A schematic is a plain Python dict with three keys: <code>labels</code>, <code>parameters</code>, and
+<code>semantic_map</code>. Schematics correspond to <strong>myocardia</strong>, <strong>planes/valves</strong>, and
+<strong>rings</strong>. They define which labels are involved, which role each label plays,
+and which parameters apply (wall thickness, ring thickness, …). Those relations
+live in the <code>semantic_map</code>.</p>
+<div class="admonition abstract">
+<p class="admonition-title">Two files, two jobs, this is the core of the tutorial</p>
+<p>Keep these separate in your head:</p>
+<ul>
+<li><strong>A new <em>structure<em> is a new </em>schematic</em></strong>, it lives in <code>myschematics.py</code>.
+  A schematic answers <em>"what is this structure?"</em>: its labels, its
+  wall-thickness parameter, and the roles in its <code>semantic_map</code> (which blood
+  pool to grow from, which label to write). The worked example below is
+  <code>rv_outflow</code>.</li>
+<li><strong>The <em>rules and the order of steps<em> are a </em>recipe</em></strong>, it lives in
+  <code>myrecipes.py</code>. A recipe answers <em>"what runs, and in what sequence?"</em>: an
+  ordered list of <code>WorkflowStep</code>s plus the <code>required_schematics</code> to scaffold.</li>
+</ul>
+<p>So the workflow is: <strong>inspect first</strong> (3.3.1). If a structure already exists,
+just reference it in a recipe. If it does <strong>not</strong> exist, author a schematic
+for it (3.3.2), then place it in a recipe (3.4).</p>
+</div>
+<h4 id="331-you-dont-need-to-define-everything">3.3.1 You don't need to define everything<a class="headerlink" href="#331-you-dont-need-to-define-everything" title="Permanent link">&para;</a></h4>
+<p>Many components already exist. If you have the <code>pycemrg-image-analysis</code> source,
+browse <code>src/pycemrg_image_analysis/schematics/</code>. You can also list what's
+available with the <code>pycemrg-ima</code> CLI:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="gp">$ </span>pycemrg-ima<span class="w"> </span>inspect
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="go">Available schematic categories:</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="go">========================================</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="go">myocardium (7):</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="go">  • aortic_wall</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="go">  • la_myocardium</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="go">  • lv_outflow</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="go">  • myo_push_steps</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="go">  • pulmonary_artery</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="go">  • ra_myocardium</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="go">  • rv_myocardium</span>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="go">valves (4):</span>
+<a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="go">  • aortic_valve</span>
+<a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="go">  • mitral_valve</span>
+<a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="go">  • pulmonary_valve</span>
+<a id="__codelineno-10-19" name="__codelineno-10-19" href="#__codelineno-10-19"></a><span class="go">  • tricuspid_valve</span>
+<a id="__codelineno-10-20" name="__codelineno-10-20" href="#__codelineno-10-20"></a>
+<a id="__codelineno-10-21" name="__codelineno-10-21" href="#__codelineno-10-21"></a><span class="go">rings (7):</span>
+<a id="__codelineno-10-22" name="__codelineno-10-22" href="#__codelineno-10-22"></a><span class="go">  • ivc_ring</span>
+<a id="__codelineno-10-23" name="__codelineno-10-23" href="#__codelineno-10-23"></a><span class="go">  • laa_ring</span>
+<a id="__codelineno-10-24" name="__codelineno-10-24" href="#__codelineno-10-24"></a><span class="go">  • lpv1_ring</span>
+<a id="__codelineno-10-25" name="__codelineno-10-25" href="#__codelineno-10-25"></a><span class="go">  • lpv2_ring</span>
+<a id="__codelineno-10-26" name="__codelineno-10-26" href="#__codelineno-10-26"></a><span class="go">  • rpv1_ring</span>
+<a id="__codelineno-10-27" name="__codelineno-10-27" href="#__codelineno-10-27"></a><span class="go">  • rpv2_ring</span>
+<a id="__codelineno-10-28" name="__codelineno-10-28" href="#__codelineno-10-28"></a><span class="go">  • svc_ring</span>
+</code></pre></div>
+<h4 id="332-author-a-new-structure-a-new-schematic">3.3.2 Author a new structure (a new schematic)<a class="headerlink" href="#332-author-a-new-structure-a-new-schematic" title="Permanent link">&para;</a></h4>
+<p>Scan the <code>myocardium</code> list from <code>pycemrg-ima inspect</code> above. Suppose you need an
+<strong><code>rv_outflow</code></strong>, the right-ventricle analogue of the built-in <code>lv_outflow</code>. It
+is <em>not</em> in the list, so it is a genuinely new structure, and a new structure is
+a new schematic.</p>
+<p>Create <code>src/tutorial_custom_heart/myschematics.py</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="c1"># src/tutorial_custom_heart/myschematics.py</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pycemrg_image_analysis.logic.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">MyocardiumSemanticRole</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">MY_SCHEMATICS</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    <span class="s2">&quot;rv_outflow&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>        <span class="c1"># Every label this structure reads or writes, with a default value.</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>        <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;RV_BP_label&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;RV_myo_label&quot;</span><span class="p">:</span> <span class="mi">103</span><span class="p">},</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>        <span class="c1"># Numeric inputs, here the wall thickness in mm.</span>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a>        <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;RV_neck_WT&quot;</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">},</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a>        <span class="c1"># The roles: grow RV_myo_label outward from RV_BP_label by RV_neck_WT.</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a>        <span class="s2">&quot;semantic_map&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>            <span class="n">MyocardiumSemanticRole</span><span class="o">.</span><span class="n">SOURCE_BLOOD_POOL_NAME</span><span class="p">:</span> <span class="s2">&quot;RV_BP_label&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>            <span class="n">MyocardiumSemanticRole</span><span class="o">.</span><span class="n">TARGET_MYOCARDIUM_NAME</span><span class="p">:</span> <span class="s2">&quot;RV_myo_label&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a>            <span class="n">MyocardiumSemanticRole</span><span class="o">.</span><span class="n">WALL_THICKNESS_PARAMETER_NAME</span><span class="p">:</span> <span class="s2">&quot;RV_neck_WT&quot;</span><span class="p">,</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>            <span class="n">MyocardiumSemanticRole</span><span class="o">.</span><span class="n">APPLICATION_STEPS</span><span class="p">:</span> <span class="p">[</span>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a>                <span class="p">{</span><span class="s2">&quot;MODE&quot;</span><span class="p">:</span> <span class="s2">&quot;ADD&quot;</span><span class="p">,</span> <span class="s2">&quot;RULE_LABEL_NAMES&quot;</span><span class="p">:</span> <span class="p">[]},</span>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a>            <span class="p">],</span>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>        <span class="p">},</span>
+<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a>    <span class="p">},</span>
+<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a><span class="p">}</span>
+</code></pre></div>
+<p>What each key does:</p>
+<ul>
+<li><strong><code>labels</code></strong>: the names this structure touches and their default integer
+  values. Match these to your <code>labels.yaml</code> (3.2): <code>RV_BP_label</code> is the input
+  cavity you grow from; <code>RV_myo_label</code> is the wall you are creating.</li>
+<li><strong><code>parameters</code></strong>: <code>RV_neck_WT</code> is how far (mm) the wall grows.</li>
+<li><strong><code>semantic_map</code></strong>: the <em>roles</em> the engine needs: which label is the source
+  blood pool, which is the target wall, which parameter is the thickness, and the
+  ordered <code>APPLICATION_STEPS</code> that write the result. <code>ADD</code> writes the new wall
+  wherever the grown mask lands. Other modes ()<code>REPLACE_ONLY</code>, <code>REPLACE_EXCEPT</code>)
+  let a structure avoid overwriting its neighbours; see the
+  <a href="../../guides/authoring_a_recipe/#application-steps-and-modes">Authoring guide</a>.</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Cross-check label names before you scaffold</p>
+<p>Run <code>pycemrg-ima create myocardium --labels config/labels.yaml</code>. It prints how
+the standard myocardium label names line up with <em>your</em> <code>labels.yaml</code> and
+flags clashes, then a value already in use, or a near-duplicate name (e.g. your
+<code>RV_bloodpool</code> vs the schematic's <code>RV_BP_label</code>). Reconcile the naming here,
+before anything is generated, so structures don't grow from the wrong voxels.</p>
+</div>
+<h4 id="333-register-your-schematic-no-library-edits">3.3.3 Register your schematic (no library edits)<a class="headerlink" href="#333-register-your-schematic-no-library-edits" title="Permanent link">&para;</a></h4>
+<p>You do <strong>not</strong> edit the installed library. Inject your dict at scaffold time with
+<code>extra_schematics=</code>; it is merged alongside the built-ins (yours win on a name
+clash), so every standard component stays available next to <code>rv_outflow</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pycemrg_image_analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageAnalysisScaffolder</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tutorial_custom_heart.myschematics</span><span class="w"> </span><span class="kn">import</span> <span class="n">MY_SCHEMATICS</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="n">scaffolder</span> <span class="o">=</span> <span class="n">ImageAnalysisScaffolder</span><span class="p">(</span><span class="n">extra_schematics</span><span class="o">=</span><span class="n">MY_SCHEMATICS</span><span class="p">)</span>
+</code></pre></div>
+<p>The reference runner takes the same <code>extra_schematics</code> argument and forwards it,
+so you usually pass it there rather than constructing the scaffolder yourself
+(see 3.5).</p>
+<h3 id="34-define-the-rules-and-order-a-recipe">3.4 Define the rules and order (a recipe)<a class="headerlink" href="#34-define-the-rules-and-order-a-recipe" title="Permanent link">&para;</a></h3>
+<p>A schematic says <em>what</em> a structure is. A <strong>recipe</strong> says <em>which</em> steps run and
+<em>in what order</em>. Create <code>src/tutorial_custom_heart/myrecipes.py</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># src/tutorial_custom_heart/myrecipes.py</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pycemrg_image_analysis.recipes</span><span class="w"> </span><span class="kn">import</span> <span class="n">Recipe</span><span class="p">,</span> <span class="n">WorkflowStep</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">MY_RECIPE</span> <span class="o">=</span> <span class="n">Recipe</span><span class="p">(</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;lv_rv_outflow&quot;</span><span class="p">,</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;LV outflow plus a custom RV outflow.&quot;</span><span class="p">,</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;create&quot;</span><span class="p">,</span> <span class="s2">&quot;lv_outflow&quot;</span><span class="p">),</span>   <span class="c1"># built-in, reused as-is</span>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;create&quot;</span><span class="p">,</span> <span class="s2">&quot;rv_outflow&quot;</span><span class="p">),</span>   <span class="c1"># your new schematic</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>    <span class="p">],</span>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>    <span class="n">required_schematics</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;lv_outflow&quot;</span><span class="p">,</span> <span class="s2">&quot;rv_outflow&quot;</span><span class="p">],</span>
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="p">)</span>
+</code></pre></div>
+<ul>
+<li><strong><code>steps</code></strong> is the execution order. Each <code>WorkflowStep(step_type,
+  component_name)</code> has a <code>step_type</code> of <code>create</code> / <code>valve</code> / <code>ring</code> / <code>push</code>.</li>
+<li><strong><code>required_schematics</code></strong> is everything the scaffolder must emit config for. It
+  is a <em>superset</em> of the step component names, it also lists parameter-only
+  schematics such as <code>myo_push_steps</code> that carry labels/thicknesses without a
+  step of their own.</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Order is load-bearing</p>
+<p>Every step writes into the same output image, so a later step can silently
+overwrite anatomy an earlier one placed. Grow a blood pool's myocardium
+<em>before</em> any valve, ring, or push that references it.</p>
+</div>
+<h3 id="35-a-push-that-lives-only-in-the-recipe-the-internal-pulmonary-artery">3.5 A push that lives only in the recipe (the internal pulmonary artery)<a class="headerlink" href="#35-a-push-that-lives-only-in-the-recipe-the-internal-pulmonary-artery" title="Permanent link">&para;</a></h3>
+<p>Some corrections are not new <em>structures</em> at all, they are <strong>pushes</strong>: one wall
+intrudes on a neighbour, so you erode the neighbour's blood-pool rim and relabel
+it as that neighbour's wall. A clinical example: a patient whose <strong>pulmonary
+artery (PArt) sits between the atria</strong>. Grown normally, the PArt wall bites into
+the LA and RA myocardium. The fix is <em>not</em> a new schematic, the PArt wall and the
+atrial labels already exist. You only need new <strong>push steps</strong>, and they surface
+in exactly two places:</p>
+<ol>
+<li>the <strong>orchestrator's push registry</strong> (the four fields: who pushes whom), and</li>
+<li>the <strong>recipe</strong> (where, in the order, the push runs).</li>
+</ol>
+<p>Nothing in <code>myschematics.py</code> changes. This is the mirror image of <code>rv_outflow</code>:
+that was a new <em>structure</em> (a schematic); this is a new <em>rule</em> (recipe + wiring).</p>
+<h4 id="351-define-the-push-fields-orchestrator-registry">3.5.1 Define the push fields (orchestrator registry)<a class="headerlink" href="#351-define-the-push-fields-orchestrator-registry" title="Permanent link">&para;</a></h4>
+<p>A push has no <code>semantic_map</code>; it is four label/parameter <em>names</em>. The PArt is the
+<code>pusher_wall</code>; each atrium is the victim whose blood pool is eroded into its own
+wall. Add these to the push registry in your copied orchestrator (the example
+<code>_PUSH_STEP_DEFINITIONS</code> in <code>examples/orchestrator_patterns.py</code>):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1"># in your project&#39;s orchestrator, merged into _PUSH_STEP_DEFINITIONS</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">CUSTOM_PUSH_DEFINITIONS</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="s2">&quot;part_push_la&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>        <span class="s2">&quot;pusher_wall&quot;</span><span class="p">:</span>     <span class="s2">&quot;PArt_wall_label&quot;</span><span class="p">,</span>  <span class="c1"># the intruding PArt wall</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>        <span class="s2">&quot;pushed_wall&quot;</span><span class="p">:</span>     <span class="s2">&quot;LA_myo_label&quot;</span><span class="p">,</span>     <span class="c1"># LA grows a wall here</span>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>        <span class="s2">&quot;pushed_bp&quot;</span><span class="p">:</span>       <span class="s2">&quot;LA_BP_label&quot;</span><span class="p">,</span>      <span class="c1"># LA cavity eroded back</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>        <span class="s2">&quot;thickness_param&quot;</span><span class="p">:</span> <span class="s2">&quot;LA_WT&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    <span class="p">},</span>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>    <span class="s2">&quot;part_push_ra&quot;</span><span class="p">:</span> <span class="p">{</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>        <span class="s2">&quot;pusher_wall&quot;</span><span class="p">:</span>     <span class="s2">&quot;PArt_wall_label&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>        <span class="s2">&quot;pushed_wall&quot;</span><span class="p">:</span>     <span class="s2">&quot;RA_myo_label&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>        <span class="s2">&quot;pushed_bp&quot;</span><span class="p">:</span>       <span class="s2">&quot;RA_BP_label&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>        <span class="s2">&quot;thickness_param&quot;</span><span class="p">:</span> <span class="s2">&quot;RA_WT&quot;</span><span class="p">,</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>    <span class="p">},</span>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="p">}</span>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="c1"># _PUSH_STEP_DEFINITIONS = {**_PUSH_STEP_DEFINITIONS, **CUSTOM_PUSH_DEFINITIONS}</span>
+</code></pre></div>
+<p>The four fields are documented in
+<a href="../../guides/authoring_a_recipe/#step-4-handle-push-steps-only-if-your-recipe-has-them">Authoring guide, Step 4</a>.</p>
+<div class="admonition info">
+<p class="admonition-title">Why there is no <code>extra_pushes=</code> hook</p>
+<p>Schematics inject cleanly via <code>extra_schematics=</code>. Push definitions have no
+equivalent argument yet, so you register them by editing the push registry in
+your copied orchestrator. Their labels and thicknesses still come from
+scaffolded config (the <code>myo_push_steps</code> schematic plus the atrial/PArt
+schematics), so only the four-field <em>wiring</em> is manual.</p>
+</div>
+<h4 id="352-the-recipe-four-chamber-rv_outflow-the-part-pushes">3.5.2 The recipe: four chamber + <code>rv_outflow</code> + the PArt pushes<a class="headerlink" href="#352-the-recipe-four-chamber-rv_outflow-the-part-pushes" title="Permanent link">&para;</a></h4>
+<p>Now assemble it. This is the built-in four-chamber flow, with your custom
+<code>rv_outflow</code> added <strong>alongside</strong> the built-in <code>rv_myocardium</code> (both write
+<code>RV_myo_label</code>, layered by step order), plus the two PArt pushes inserted after
+the atria exist. Add to <code>myrecipes.py</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1"># src/tutorial_custom_heart/myrecipes.py (continued)</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pycemrg_image_analysis.recipes</span><span class="w"> </span><span class="kn">import</span> <span class="n">Recipe</span><span class="p">,</span> <span class="n">WorkflowStep</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="n">FOUR_CHAMBER_INTERNAL_PART</span> <span class="o">=</span> <span class="n">Recipe</span><span class="p">(</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;four_chamber_internal_part&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Four-chamber heart with a custom RV outflow and an internal &quot;</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>                <span class="s2">&quot;pulmonary artery pushed out of the atrial walls.&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>    <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>        <span class="c1"># --- Outflow necks (rv_outflow mirrors lv_outflow) ---</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;create&quot;</span><span class="p">,</span> <span class="s2">&quot;lv_outflow&quot;</span><span class="p">),</span>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;create&quot;</span><span class="p">,</span> <span class="s2">&quot;rv_outflow&quot;</span><span class="p">),</span>          <span class="c1"># your new schematic (3.3.2)</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a>        <span class="c1"># --- Great vessels ---</span>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;create&quot;</span><span class="p">,</span> <span class="s2">&quot;aortic_wall&quot;</span><span class="p">),</span>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;create&quot;</span><span class="p">,</span> <span class="s2">&quot;pulmonary_artery&quot;</span><span class="p">),</span>    <span class="c1"># grows PArt_wall_label</span>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;push&quot;</span><span class="p">,</span>   <span class="s2">&quot;part_push_aorta&quot;</span><span class="p">),</span>      <span class="c1"># built-in: aorta pushes PArt</span>
+<a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;push&quot;</span><span class="p">,</span>   <span class="s2">&quot;part_push_lv&quot;</span><span class="p">),</span>          <span class="c1"># built-in: LV pushes PArt</span>
+<a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a>        <span class="c1"># --- Main ventricular + atrial walls ---</span>
+<a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;create&quot;</span><span class="p">,</span> <span class="s2">&quot;rv_myocardium&quot;</span><span class="p">),</span>         <span class="c1"># built-in: main RV wall</span>
+<a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;create&quot;</span><span class="p">,</span> <span class="s2">&quot;la_myocardium&quot;</span><span class="p">),</span>
+<a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;create&quot;</span><span class="p">,</span> <span class="s2">&quot;ra_myocardium&quot;</span><span class="p">),</span>
+<a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a>        <span class="c1"># --- NEW: the internal PArt pushes the atrial walls back ---</span>
+<a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;push&quot;</span><span class="p">,</span>   <span class="s2">&quot;part_push_la&quot;</span><span class="p">),</span>
+<a id="__codelineno-15-23" name="__codelineno-15-23" href="#__codelineno-15-23"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;push&quot;</span><span class="p">,</span>   <span class="s2">&quot;part_push_ra&quot;</span><span class="p">),</span>
+<a id="__codelineno-15-24" name="__codelineno-15-24" href="#__codelineno-15-24"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;push&quot;</span><span class="p">,</span>   <span class="s2">&quot;la_push_aorta&quot;</span><span class="p">),</span>
+<a id="__codelineno-15-25" name="__codelineno-15-25" href="#__codelineno-15-25"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;push&quot;</span><span class="p">,</span>   <span class="s2">&quot;rv_push_aorta&quot;</span><span class="p">),</span>
+<a id="__codelineno-15-26" name="__codelineno-15-26" href="#__codelineno-15-26"></a>        <span class="c1"># --- Valves ---</span>
+<a id="__codelineno-15-27" name="__codelineno-15-27" href="#__codelineno-15-27"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;valve&quot;</span><span class="p">,</span> <span class="s2">&quot;mitral_valve&quot;</span><span class="p">),</span>
+<a id="__codelineno-15-28" name="__codelineno-15-28" href="#__codelineno-15-28"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;valve&quot;</span><span class="p">,</span> <span class="s2">&quot;tricuspid_valve&quot;</span><span class="p">),</span>
+<a id="__codelineno-15-29" name="__codelineno-15-29" href="#__codelineno-15-29"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;valve&quot;</span><span class="p">,</span> <span class="s2">&quot;aortic_valve&quot;</span><span class="p">),</span>
+<a id="__codelineno-15-30" name="__codelineno-15-30" href="#__codelineno-15-30"></a>        <span class="n">WorkflowStep</span><span class="p">(</span><span class="s2">&quot;valve&quot;</span><span class="p">,</span> <span class="s2">&quot;pulmonary_valve&quot;</span><span class="p">),</span>
+<a id="__codelineno-15-31" name="__codelineno-15-31" href="#__codelineno-15-31"></a>    <span class="p">],</span>
+<a id="__codelineno-15-32" name="__codelineno-15-32" href="#__codelineno-15-32"></a>    <span class="n">required_schematics</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-15-33" name="__codelineno-15-33" href="#__codelineno-15-33"></a>        <span class="s2">&quot;lv_outflow&quot;</span><span class="p">,</span> <span class="s2">&quot;rv_outflow&quot;</span><span class="p">,</span>        <span class="c1"># rv_outflow is custom (extra_schematics)</span>
+<a id="__codelineno-15-34" name="__codelineno-15-34" href="#__codelineno-15-34"></a>        <span class="s2">&quot;aortic_wall&quot;</span><span class="p">,</span> <span class="s2">&quot;pulmonary_artery&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-35" name="__codelineno-15-35" href="#__codelineno-15-35"></a>        <span class="s2">&quot;rv_myocardium&quot;</span><span class="p">,</span> <span class="s2">&quot;la_myocardium&quot;</span><span class="p">,</span> <span class="s2">&quot;ra_myocardium&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-36" name="__codelineno-15-36" href="#__codelineno-15-36"></a>        <span class="s2">&quot;myo_push_steps&quot;</span><span class="p">,</span>                  <span class="c1"># carries push labels + thicknesses</span>
+<a id="__codelineno-15-37" name="__codelineno-15-37" href="#__codelineno-15-37"></a>        <span class="s2">&quot;mitral_valve&quot;</span><span class="p">,</span> <span class="s2">&quot;tricuspid_valve&quot;</span><span class="p">,</span> <span class="s2">&quot;aortic_valve&quot;</span><span class="p">,</span> <span class="s2">&quot;pulmonary_valve&quot;</span><span class="p">,</span>
+<a id="__codelineno-15-38" name="__codelineno-15-38" href="#__codelineno-15-38"></a>    <span class="p">],</span>
+<a id="__codelineno-15-39" name="__codelineno-15-39" href="#__codelineno-15-39"></a><span class="p">)</span>
+</code></pre></div>
+<p>Read the ordering against the load-bearing rule:</p>
+<ul>
+<li><code>rv_outflow</code> (<code>ADD</code>) and <code>rv_myocardium</code> (<code>REPLACE_ONLY</code> over <code>Ao_wall_label</code>)
+  both write <code>RV_myo_label</code>, so step order layers them; <code>rv_myocardium</code> runs
+  <strong>after</strong> <code>aortic_wall</code> so there is an <code>Ao_wall_label</code> for it to replace.</li>
+<li><code>part_push_la</code> / <code>part_push_ra</code> come <strong>after</strong> <code>create pulmonary_artery</code>,
+  because a push reads its <code>pusher_wall</code> (<code>PArt_wall_label</code>) — that wall must
+  already exist.</li>
+<li>They come <strong>after</strong> <code>create la_myocardium</code> / <code>create ra_myocardium</code>, so each
+  atrium has its wall before the PArt reinforces it, and the atrial blood pools
+  (<code>LA_BP_label</code> / <code>RA_BP_label</code>) are still present to be eroded.</li>
+</ul>
+<p>For the push correction itself, notice what did <strong>not</strong> change: it added <strong>no new
+schematic</strong>. The pushes reused labels (<code>PArt_wall_label</code>, <code>LA_myo_label</code>,
+<code>RA_myo_label</code>, …) and parameters (<code>LA_WT</code>, <code>RA_WT</code>) the four-chamber schematics
+already define. (<code>rv_outflow</code> <em>is</em> a new schematic, but that is the new
+<em>structure</em> you authored in 3.3.2 — separate from the push.) The patient's
+unusual anatomy is captured by <strong>recipe order + push wiring</strong>.</p>
+<h3 id="36-run-it">3.6 Run it<a class="headerlink" href="#36-run-it" title="Permanent link">&para;</a></h3>
+<p>Drive the recipe with <code>run_recipe_workflow</code>, passing your <code>Recipe</code> object and your
+schematics. A schematic-only recipe (like <code>MY_RECIPE</code> from 3.4) can use the
+reference runner straight from <code>examples/orchestrator_patterns.py</code>. The
+<code>FOUR_CHAMBER_INTERNAL_PART</code> recipe uses your custom push steps, so import the
+runner from <strong>your copied orchestrator</strong> — the one with <code>CUSTOM_PUSH_DEFINITIONS</code>
+merged into its push registry (3.5.1):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="c1"># Your copied orchestrator, with CUSTOM_PUSH_DEFINITIONS merged into the registry:</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tutorial_custom_heart.orchestrator</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_recipe_workflow</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tutorial_custom_heart.myschematics</span><span class="w"> </span><span class="kn">import</span> <span class="n">MY_SCHEMATICS</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tutorial_custom_heart.myrecipes</span><span class="w"> </span><span class="kn">import</span> <span class="n">FOUR_CHAMBER_INTERNAL_PART</span>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="n">run_recipe_workflow</span><span class="p">(</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>    <span class="n">FOUR_CHAMBER_INTERNAL_PART</span><span class="p">,</span>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>    <span class="n">input_seg_path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;seg_input.nrrd&quot;</span><span class="p">),</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>    <span class="n">output_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;output/&quot;</span><span class="p">),</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>    <span class="n">extra_schematics</span><span class="o">=</span><span class="n">MY_SCHEMATICS</span><span class="p">,</span>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>    <span class="c1"># label_mapping={&quot;RV_BP_label&quot;: 3, ...}  # only if your image&#39;s ints differ</span>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="p">)</span>
+</code></pre></div>
+<p>The runner scaffolds the config (including your <code>rv_outflow</code>), then executes each
+step in order, saving an intermediate image per step so you can see exactly where
+each structure landed — including the two PArt pushes reshaping the atrial walls.
+The final result is written as <code>output/seg_final_four_chamber_internal_part.nrrd</code>.</p>
+<h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><a href="../../guides/authoring_a_recipe/">Authoring a Recipe</a></strong>: the mental model and full reference this tutorial is based on.</li>
+<li><strong><a href="../../api/overview/">Architecture</a></strong>: the stateless-toolbox philosophy and orchestration pattern.</li>
+<li><strong><a href="../../api/label_tools/">Label Tools</a></strong> / <strong><a href="../../cli/labels/">CLI</a></strong>: diagnose and fix mismatched label values.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../../getting-started/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Getting Started">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Getting Started
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../api/overview/" class="md-footer__link md-footer__link--next" aria-label="Next: Architecture">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Architecture
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "navigation.tracking", "toc.follow", "search.highlight", "search.suggest", "search.share", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
