@@ -26,7 +26,7 @@ start with [Architecture](overview.md).
 | Module | What it does | Page |
 |---|---|---|
 | Augmentation | Intensity & spatial augmentation for SR training pipelines | [Augmentation](augmentation.md) |
-| Metrics | Volume-comparison metrics (MSE, PSNR, SSIM, gradient error) | [Metrics](metrics.md) |
+| Metrics | Volume-comparison metrics (MSE, PSNR, SSIM, gradient error) and segmentation overlap (Dice) | [Metrics](metrics.md) |
 
 !!! info "Looking for the orchestration pattern?"
     The high-level scaffold → load → run → save sequence, the logic engines

@@ -54,6 +54,106 @@ def compute_mse(predicted: np.ndarray, ground_truth: np.ndarray) -> float:
     return float(np.mean((predicted - ground_truth) ** 2))
 
 
+def compute_dice(predicted: np.ndarray, ground_truth: np.ndarray) -> float:
+    """
+    Compute the Dice similarity coefficient between two binary masks.
+
+    Unlike the intensity metrics in this module, Dice operates on *binary masks*
+    (segmentation overlap), NOT on normalized [0, 1] intensity volumes. Inputs are
+    coerced to boolean, so 0/1 integer masks, boolean masks, or a single binarised
+    label slice are all accepted.
+
+    Args:
+        predicted: Predicted mask (any shape). Coerced to bool.
+        ground_truth: Ground truth mask (same shape as predicted). Coerced to bool.
+
+    Returns:
+        Dice coefficient in [0, 1], where 1.0 is perfect overlap. Returns NaN when
+        BOTH masks are empty (the label is absent from both volumes, so overlap is
+        undefined). If exactly one mask is empty, the result is 0.0.
+
+    Raises:
+        ValueError: If shapes don't match.
+
+    Note:
+        Dice = 2 * |A ∩ B| / (|A| + |B|)
+
+    Example:
+        >>> pred = np.array([[0, 1], [1, 1]])
+        >>> gt = np.array([[0, 1], [1, 0]])
+        >>> compute_dice(pred, gt)
+        0.8
+    """
+    _validate_shapes(predicted, ground_truth)
+
+    pred_mask = predicted.astype(bool)
+    gt_mask = ground_truth.astype(bool)
+
+    denominator = pred_mask.sum() + gt_mask.sum()
+    if denominator == 0:
+        logger.debug("Both masks are empty - Dice is undefined. Returning NaN.")
+        return float("nan")
+
+    intersection = np.logical_and(pred_mask, gt_mask).sum()
+    return float(2.0 * intersection / denominator)
+
+
+def compute_dice_per_label(
+    predicted: np.ndarray,
+    ground_truth: np.ndarray,
+    labels: List[int] = None,
+    include_background: bool = False,
+) -> Dict[int, float]:
+    """
+    Compute the Dice coefficient independently for each label in two label maps.
+
+    Operates on *integer label maps* (multi-label segmentations), NOT on normalized
+    [0, 1] intensity volumes. Each label is binarised in turn and compared via
+    :func:`compute_dice`.
+
+    Args:
+        predicted: Predicted integer label map in (Z, Y, X) format.
+        ground_truth: Ground truth integer label map (same shape as predicted).
+        labels: Explicit labels to score. If None, the label set is derived from the
+                union of unique values across both volumes.
+        include_background: If False (default), label 0 is dropped from the set even
+                when present. If True, label 0 is scored like any other label.
+
+    Returns:
+        Dictionary mapping each label (int) to its Dice coefficient (float). A label
+        absent from both volumes maps to NaN (see :func:`compute_dice`). Returns an
+        empty dict when no labels remain (e.g. a background-only image with
+        include_background=False).
+
+    Raises:
+        ValueError: If shapes don't match.
+
+    Note:
+        To obtain mean foreground Dice while ignoring absent labels:
+        >>> scores = compute_dice_per_label(pred, gt)
+        >>> mean_dice = float(np.nanmean(list(scores.values())))
+
+    Example:
+        >>> pred = np.array([0, 1, 1, 2, 2])
+        >>> gt = np.array([0, 1, 2, 2, 2])
+        >>> compute_dice_per_label(pred, gt)
+        {1: 0.6666666666666666, 2: 0.8}
+    """
+    _validate_shapes(predicted, ground_truth)
+
+    if labels is None:
+        labels = np.union1d(np.unique(predicted), np.unique(ground_truth))
+
+    label_values = [int(label) for label in labels]
+    if not include_background:
+        label_values = [label for label in label_values if label != 0]
+
+    return {
+        label: compute_dice(predicted == label, ground_truth == label)
+        for label in label_values
+    }
+
+
 def compute_psnr(
     predicted: np.ndarray, ground_truth: np.ndarray, data_range: float = 1.0
 ) -> float:

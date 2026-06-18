@@ -2,7 +2,7 @@
 
 **Module:** Image quality metrics for volume comparison and validation.
 
-**Convention:** All functions expect pre-normalized data in `[0, 1]` range and arrays in `(Z, Y, X)` format.
+**Convention:** Intensity metrics expect pre-normalized data in `[0, 1]` range and arrays in `(Z, Y, X)` format. The segmentation overlap metrics (`compute_dice`, `compute_dice_per_label`) are the exception: they operate on **binary masks / integer label maps**, not normalized intensities.
 
 ---
 
@@ -240,6 +240,94 @@ results = compare_volumes(
 
 ---
 
+## Segmentation Overlap (Dice)
+
+These functions measure label overlap between two segmentations. Unlike the
+intensity metrics above, they operate on **binary masks** or **integer label maps**,
+not normalized `[0, 1]` volumes.
+
+### `compute_dice()`
+
+```python
+def compute_dice(
+    predicted: np.ndarray,
+    ground_truth: np.ndarray
+) -> float
+```
+
+Compute the Dice similarity coefficient between two binary masks. Inputs are coerced
+to boolean, so `0/1` integer masks, boolean masks, or a single binarised label slice
+are all accepted.
+
+**Parameters:**
+- `predicted` (np.ndarray): Predicted mask (any shape). Coerced to `bool`.
+- `ground_truth` (np.ndarray): Ground truth mask (same shape as predicted). Coerced to `bool`.
+
+**Returns:**
+- `float`: Dice coefficient in `[0, 1]`, where `1.0` is perfect overlap. Returns `NaN`
+  when **both** masks are empty (overlap undefined); `0.0` when exactly one is empty.
+
+**Raises:**
+- `ValueError`: If shapes don't match
+
+**Notes:**
+- Formula: `Dice = 2 * |A ∩ B| / (|A| + |B|)`
+
+**Example:**
+```python
+pred = np.array([[0, 1], [1, 1]])
+gt = np.array([[0, 1], [1, 0]])
+compute_dice(pred, gt)  # 0.8
+```
+
+---
+
+### `compute_dice_per_label()`
+
+```python
+def compute_dice_per_label(
+    predicted: np.ndarray,
+    ground_truth: np.ndarray,
+    labels: List[int] = None,
+    include_background: bool = False
+) -> Dict[int, float]
+```
+
+Compute the Dice coefficient independently for each label in two integer label maps.
+Each label is binarised in turn and compared via `compute_dice`.
+
+**Parameters:**
+- `predicted` (np.ndarray): Predicted integer label map in `(Z, Y, X)` format
+- `ground_truth` (np.ndarray): Ground truth label map (same shape as predicted)
+- `labels` (List[int], optional): Explicit labels to score. If `None`, derived from the
+  union of unique values across both volumes.
+- `include_background` (bool, optional): If `False` (default), label `0` is dropped even
+  when present. If `True`, label `0` is scored like any other label.
+
+**Returns:**
+- `dict`: Mapping each label (`int`) to its Dice coefficient (`float`). A label absent
+  from both volumes maps to `NaN`. Returns an empty dict when no labels remain (e.g. a
+  background-only image with `include_background=False`).
+
+**Raises:**
+- `ValueError`: If shapes don't match
+
+**Notes:**
+- To obtain mean foreground Dice while ignoring absent labels, aggregate with `np.nanmean`.
+
+**Example:**
+```python
+pred = np.array([0, 1, 1, 2, 2])
+gt = np.array([0, 1, 2, 2, 2])
+
+scores = compute_dice_per_label(pred, gt)
+# {1: 0.666..., 2: 0.8}
+
+mean_dice = float(np.nanmean(list(scores.values())))
+```
+
+---
+
 ## Usage Pattern for Interpolation Validation
 
 ```python
@@ -277,7 +365,7 @@ else:
 
 ## Design Principles
 
-1. **Pre-normalized Input:** All functions assume data is in `[0, 1]` range. Normalization is the responsibility of the orchestrator/preprocessing pipeline.
+1. **Pre-normalized Input:** Intensity metrics assume data is in `[0, 1]` range. Normalization is the responsibility of the orchestrator/preprocessing pipeline. The Dice overlap metrics are the exception — they take binary masks / integer label maps.
 
 2. **Axis Convention:** All arrays must be in `(Z, Y, X)` format, consistent with `pycemrg-image-analysis` suite convention.
 

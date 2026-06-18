@@ -45,6 +45,8 @@ from pycemrg_image_analysis.utilities.metrics import (
     compute_psnr,
     compute_ssim,
     compute_gradient_error,
+    compute_dice,
+    compute_dice_per_label,
     compare_volumes,
 )
 
@@ -129,6 +131,8 @@ __all__ = [
     "compute_psnr",
     "compute_ssim",
     "compute_gradient_error",
+    "compute_dice",
+    "compute_dice_per_label",
     "compare_volumes",
     # Augmentation Utilities
     "augment_brightness",
