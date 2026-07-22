@@ -3,10 +3,16 @@
 import logging
 import numpy as np
 import SimpleITK as sitk
+
+from enum import Enum
 from typing import Tuple, Optional
 
 logger = logging.getLogger(__name__)
 
+class PyCemrgInterp(Enum):
+    linear = sitk.sitkLinear
+    bspline = sitk.sitkBSpline
+    nearest = sitk.sitkNearestNeighbor
 
 def compute_target_shape(
     original_shape: Tuple[int, int, int],
@@ -56,7 +62,10 @@ def compute_actual_spacing(
     )
 
 
-def resample_to_isotropic(image: sitk.Image, target_spacing: float = 1.0) -> sitk.Image:
+def resample_to_isotropic(
+        image: sitk.Image, 
+        target_spacing: float = 1.0, 
+        interpolator: PyCemrgInterp = PyCemrgInterp.linear) -> sitk.Image:
     """
     Resample an image to isotropic spacing (x=y=z).
     """
@@ -77,7 +86,7 @@ def resample_to_isotropic(image: sitk.Image, target_spacing: float = 1.0) -> sit
     resampler.SetOutputOrigin(image.GetOrigin())
     resampler.SetTransform(sitk.Transform())
     resampler.SetDefaultPixelValue(image.GetPixelIDValue())
-    resampler.SetInterpolator(sitk.sitkLinear)
+    resampler.SetInterpolator(interpolator.value)
 
     return resampler.Execute(image)
 
