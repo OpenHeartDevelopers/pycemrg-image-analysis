@@ -111,6 +111,11 @@ def keep_labels(image: sitk.Image, labels_to_keep: List[int]) -> sitk.Image:
     logger.info(f"Kept {len(labels_to_keep)} labels: {labels_to_keep}")
     return result
 
+def get_labels_plain(image: sitk.Image) -> list[int]:
+    array = sitk.GetArrayFromImage(image)
+    unique_labels = np.unique(array).astype(int)
+
+    return list(unique_labels)
 
 def inspect_labels(image: sitk.Image, label_manager: LabelManager) -> dict[int, str]:
     """

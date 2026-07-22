@@ -8,6 +8,7 @@ from pycemrg_image_analysis.utilities.spatial import (
     get_voxel_physical_bounds,
     extract_slice_voxels,
     sample_image_at_points,
+    PyCemrgInterp,
 )
 from pycemrg_image_analysis.utilities.geometry import calculate_cylinder_mask
 from pycemrg_image_analysis.utilities.masks import (
@@ -62,6 +63,7 @@ from pycemrg_image_analysis.utilities.postprocessing import (
     remove_labels,
     keep_labels,
     inspect_labels,
+    get_labels_plain,
     remove_labels_by_name,
     keep_labels_by_name,
     relabel_image,
@@ -115,6 +117,7 @@ __all__ = [
     "get_voxel_physical_bounds",
     "extract_slice_voxels",
     "sample_image_at_points",
+    "PyCemrgInterp",
     # Dispatchers
     "get_mask_operation_dispatcher",
     # Intensity Utilities
@@ -144,6 +147,7 @@ __all__ = [
     "remove_labels",
     "keep_labels",
     "inspect_labels",
+    "get_labels_plain",
     "remove_labels_by_name",
     "keep_labels_by_name",
     "relabel_image",
