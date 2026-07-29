@@ -111,8 +111,22 @@ def keep_labels(image: sitk.Image, labels_to_keep: List[int]) -> sitk.Image:
     logger.info(f"Kept {len(labels_to_keep)} labels: {labels_to_keep}")
     return result
 
-def get_labels_plain(image: sitk.Image) -> list[int]:
+def get_labels_plain(
+        image: sitk.Image,
+        remove_bck_label: bool = True,
+        background_label: int = 0,
+    ) -> list[int]:
+
     array = sitk.GetArrayFromImage(image)
+    if remove_bck_label :
+        array = array[array != background_label]
+
+        if array.size == 0:
+            logger.warning(
+                f"Image only contained BACKGROUND LABEL = {background_label}"
+                "Returning empty list!"
+            )
+    
     unique_labels = np.unique(array).astype(int)
 
     return list(unique_labels)
