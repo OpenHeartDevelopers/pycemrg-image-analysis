@@ -85,6 +85,18 @@ from pycemrg_image_analysis.utilities.components import (
     keep_largest_structure,
 )
 
+from pycemrg_image_analysis.utilities.frames import (
+    DEFAULT_RESCALE_FACTOR,
+    SmoothFrame,
+    apply_affine,
+    believed_spacing,
+    distortion_matrix,
+    image_mesh_to_world_affine,
+    lps_to_ras,
+    mesh_to_world_affine,
+    smooth_voxel_to_world_affine,
+)
+
 
 __all__ = [
     # IO Utilities
@@ -106,6 +118,16 @@ __all__ = [
     # Components 
     "keep_largest_component",
     "keep_largest_structure",
+    # Frame Recovery (segsmooth world-frame loss)
+    "DEFAULT_RESCALE_FACTOR",
+    "SmoothFrame",
+    "apply_affine",
+    "believed_spacing",
+    "distortion_matrix",
+    "image_mesh_to_world_affine",
+    "lps_to_ras",
+    "mesh_to_world_affine",
+    "smooth_voxel_to_world_affine",
     # Filter Utilities
     "and_filter",
     "distance_map",
